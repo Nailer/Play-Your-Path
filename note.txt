@@ -1,0 +1,4 @@
+the  aquarium area is js/min/npcs-min.js
+the room window area is js/min/game-min.js line 79
+
+

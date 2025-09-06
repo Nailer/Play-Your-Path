@@ -4117,7 +4117,7 @@
 
 }
 .room #aquarium_view {
-  width: 244px;
+  width: 420px;
   height: 473px;
   top: 20%;
   left: 10%;
@@ -4125,9 +4125,9 @@
   background: url(../images/aquarium_view.png);
 }
 .room #boiler_room_view {
-  width: 122px;
-  height: 147px;
-  left: 40%;
+  width: 500px;
+  height: 500px;
+  left: 30%;
   bottom: 25%;
   right: 10%;
   z-index: 1;
@@ -4144,8 +4144,8 @@
   opacity: 0;
 }
 .room #corridor_view {
-  width: 320px;
-  height: 304px;
+  width: 500px;
+  height: 500px;
   right: 23%;
   bottom: 35%;
   right: 10%;
