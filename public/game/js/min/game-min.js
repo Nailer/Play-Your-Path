@@ -164,7 +164,7 @@ var game = {
                 $(room.player_body())
                   .css("background-position", "-310px 0")
                   .animate({ opacity: 0 }, 2e3);
-                $("#player").text_cloud("This aquarium is... Strange", 1500);
+                $("#player").text_cloud("Hedera's world is... Strange and interesting", 1500);
                 setTimeout(function () {
                   scene.no_click(!1);
                   sound_teleport.play();
@@ -573,61 +573,74 @@ var game = {
       player_position_y: b,
       volume: 50,
       execute: function () {
-        $("body").css("background", "#cff3f3");
-        var a = $("#the_game").find("#twig");
-        $("#3-3, #the_game #twig").hover(
+      $("body").css("background", "#cff3f3");
+
+      // --- COLLECTIBLE (twig) → open link after walking to it ---
+      const $twig = $("#the_game").find("#twig");
+
+      // Set your link here (or put it in HTML as data-link="https://…")
+      const linkUrl = $twig.data("link") || "https://www.hashpack.app/download";
+
+      // Wrap the twig with an anchor (only once)
+      if (!$twig.parent().is("a.collectible-link")) {
+        $twig.wrap(
+          '<a class="collectible-link" href="' + linkUrl +
+          '" target="_blank" rel="noopener noreferrer"></a>'
+        );
+      }
+
+      // Keep your original hover z-index behavior
+      $("#3-3, #the_game #twig").hover(
+        function () { $twig.css("z-index", "1000"); },
+        function () { $twig.css("z-index", "1"); }
+      );
+
+      // When clicking the twig, walk to 3-3, then navigate to the link
+      $twig.parent("a.collectible-link").off("click").on("click", function (evt) {
+        evt.preventDefault();                    // don't navigate yet
+        const href = this.href;                  // capture values now
+        const tgt  = this.target || "_self";
+
+        room.the_player.go_to.start({
+          target: "3-3",
+          action: function () {
+            if (tgt === "_blank") {
+              window.open(href, "_blank", "noopener,noreferrer");
+            } else {
+              window.location.href = href;
+            }
+          }
+        });
+      });
+      // --- END twig override ---
+
+      // EXIT / TELEPORT (unchanged)
+      $("#the_game").find("#exit")
+        .hover(
           function () {
-            a.css("z-index", "1000");
+            $("#the_game").find("#teleport").find(".core").css({
+              width: "140px", height: "140px", opacity: ".3", margin: "-71px 0 0 -71px",
+            });
           },
           function () {
-            a.css("z-index", "1");
+            $("#the_game").find("#teleport").find(".core").css({
+              width: "40px", height: "40px", opacity: ".6", margin: "-21px 0 0 -21px",
+            });
           }
-        );
-        a.click(function () {
+        )
+        .click(function () {
           room.the_player.go_to.start({
-            target: "3-3",
+            target: "7-8",
             action: function () {
-              items.take("#twig");
+              sound_teleport.play();
+              game.room(3, 7);
             },
           });
         });
-        $("#the_game")
-          .find("#exit")
-          .hover(
-            function () {
-              $("#the_game")
-                .find("#teleport")
-                .find(".core")
-                .css({
-                  width: "140px",
-                  height: "140px",
-                  opacity: ".3",
-                  margin: "-71px 0 0 -71px",
-                });
-            },
-            function () {
-              $("#the_game")
-                .find("#teleport")
-                .find(".core")
-                .css({
-                  width: "40px",
-                  height: "40px",
-                  opacity: ".6",
-                  margin: "-21px 0 0 -21px",
-                });
-            }
-          )
-          .click(function () {
-            room.the_player.go_to.start({
-              target: "7-8",
-              action: function () {
-                sound_teleport.play();
-                game.room(3, 7);
-              },
-            });
-          });
-        $("#exit, #the_game #twig").tooltip("left");
-      },
+
+      $("#exit, #the_game #twig").tooltip("left");
+    }
+
     });
   },
   corridor: function (a, b) {
