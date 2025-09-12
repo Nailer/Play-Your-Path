@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PYP — Village Square</title>
+  <link rel="stylesheet" type="text/css" href="css/styles.css" />
+</head>
+<body style="background:#1a1a1a; color:#eee; font-family: sans-serif;" oncontextmenu="return false">
+
+  <div style="position:fixed; top:12px; left:12px; z-index:9999; display:flex; gap:8px;">
+    <button onclick="window.location.href='index.html'">Return to The House</button>
+    <button onclick="window.location.href='festival.html'">Festival Grounds</button>
+    <button onclick="window.location.href='arena.html'">Arena</button>
+  </div>
+
+  <div style="display:flex; align-items:center; justify-content:center; height:100vh;">
+    <div style="text-align:center; max-width:720px;">
+      <h1 style="margin-bottom:8px;">Village Square</h1>
+      <p style="opacity:0.85;">Welcome to the Village Square. Explore African-inspired activities. Use the menu to teleport to other locations.</p>
+      <div style="margin-top:24px; display:flex; gap:12px; justify-content:center;">
+        <button onclick="window.PYP && window.PYP.login && window.PYP.login('hashpack')">Login Wallet (HashPack)</button>
+        <button onclick="window.PYP && window.PYP.mintBadge && window.PYP.mintBadge('learning-init')">Mint Badge (Demo)</button>
+        <button onclick="window.PYP && window.PYP.rewardTokens && window.PYP.rewardTokens(10)">Reward Tokens (Demo)</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    window.PYP = window.PYP || {};
+    window.PYP.login = window.PYP.login || function(provider){ console.log('Hedera login placeholder', provider); };
+    window.PYP.mintBadge = window.PYP.mintBadge || function(badgeId){ console.log('Mint NFT badge placeholder', badgeId); };
+    window.PYP.rewardTokens = window.PYP.rewardTokens || function(amount){ console.log('Reward tokens placeholder', amount); };
+  </script>
+</body>
+</html>
+
+

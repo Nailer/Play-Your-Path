@@ -1,0 +1,12 @@
+/* App.css - Additional styles for the main app */
+.app {
+  min-height: 100vh;
+  background: #1a1a1a;
+}
+
+/* Ensure iframe takes full available space */
+.app iframe {
+  width: 100% !important;
+  height: calc(100vh - 60px) !important;
+  border: none;
+}

@@ -6,15 +6,13 @@ export default function GameFrame() {
   return (
     <div className="">
       <iframe
-        src="/game/index.html"
+        src={process.env.PUBLIC_URL + '/game/index.html'}
         title="My Game"
         className=""
         name="iframe1" 
-        id="iframe1"  
-        frameborder="0" 
-        border="0" 
-        cellspacing="0"
-        style={{ borderStyle: "none", width: "120%", height: "1000px" }}
+        id="iframe1"
+        frameBorder="0"
+        style={{ border: "none", width: "100%", height: "calc(100vh - 60px)" }}
       />
     </div>
   );
