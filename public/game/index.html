@@ -6,7 +6,7 @@
 
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The House</title>
+<title>Play Your Path (PYP)</title>
 
 <link rel="shortcut icon" href="favicon.png" type="image/x-icon" />
 
@@ -57,6 +57,46 @@ Modernizr.load({
 					'js/min/old_browser.js'
 				]
 });
+
+// PYP overlay/menu and portal controls
+var pypOverlay = document.createElement('div');
+pypOverlay.id = 'pyp-overlay';
+pypOverlay.style.position = 'fixed';
+pypOverlay.style.top = '12px';
+pypOverlay.style.right = '12px';
+pypOverlay.style.zIndex = '9999';
+pypOverlay.style.display = 'flex';
+pypOverlay.style.gap = '8px';
+
+function mkBtn(label, onClick){
+    var b = document.createElement('button');
+    b.textContent = label;
+    b.style.padding = '8px 10px';
+    b.style.cursor = 'pointer';
+    b.onclick = onClick;
+    return b;
+}
+
+var learnBtn = mkBtn('Learn', function(){ window.postMessage({type:'PYP_MODE', mode:'learn'}, '*'); });
+var playBtn = mkBtn('Play', function(){ window.postMessage({type:'PYP_MODE', mode:'play'}, '*'); });
+var tradeBtn = mkBtn('Trade', function(){ window.postMessage({type:'PYP_MODE', mode:'trade'}, '*'); });
+var governBtn = mkBtn('Govern', function(){ window.postMessage({type:'PYP_MODE', mode:'govern'}, '*'); });
+var teleportBtn = mkBtn('Teleport', function(){ window.location.href = 'village.html'; });
+
+pypOverlay.appendChild(learnBtn);
+pypOverlay.appendChild(playBtn);
+pypOverlay.appendChild(tradeBtn);
+pypOverlay.appendChild(governBtn);
+pypOverlay.appendChild(teleportBtn);
+
+document.body.appendChild(pypOverlay);
+
+// Hedera hooks stub
+window.PYP = window.PYP || {};
+window.PYP.login = function(provider){ console.log('Hedera login placeholder', provider); };
+window.PYP.mintBadge = function(badgeId){ console.log('Mint NFT badge placeholder', badgeId); };
+window.PYP.rewardTokens = function(amount){ console.log('Reward tokens placeholder', amount); };
+
 </script>
 
 </head>
@@ -64,7 +104,7 @@ Modernizr.load({
 <body oncontextmenu="return false">
 <div id="return"></div>
 
-	<div id="the_game">
+	<div id="the_game" data-pyp-root="pyp-hub">
 
 		<div id="information" style="
 			color:#888;
@@ -75,7 +115,7 @@ Modernizr.load({
 			top:10%;
 			text-align:center
 		">
-			<p>You have to enable javascript on your browser in order to play The House: <a href="http://www.google.com/support/bin/answer.py?answer=23852" title="How to enable javascript?">see instructions</a> </p>
+			<p>You have to enable javascript on your browser in order to play Play Your Path: <a href="http://www.google.com/support/bin/answer.py?answer=23852" title="How to enable javascript?">see instructions</a> </p>
 
 			<p><strong>Note:</strong>You'll also need <em>the latest browser version</em>. Otherwise the game won't start!</p>
 			
@@ -104,9 +144,7 @@ Modernizr.load({
 
 	<div id="author">
 		<div class="btn">i</div>
-		<p>Game made by <a target="_blank" href="http://arturkot.pl">Artur Kot</a></p>
-		<p>Follow me on <a target="_blank" href="http://twitter.com/arturkot">Twitter</a></p>
-		<p>Learn more about the game on <a target="_blank" href="http://github.com/arturkot/the-house-game">Github</a></p>
+		<p>Play Your Path (PYP) — African-inspired adventures</p>
 	</div>
 
 <script>
