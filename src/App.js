@@ -30,18 +30,18 @@ function App() {
     try {
       // Create user profile in Supabase
       const profileData = {
-        id: userData.id,
         email: userData.email,
         name: userData.name,
         auth_type: userData.authType,
         wallet_address: userData.walletAddress
       };
       
-      await createUserProfile(profileData);
+      const savedProfile = await createUserProfile(profileData);
+      const userWithProfile = { ...userData, profileId: savedProfile.id };
       
-      setUser(userData);
+      setUser(userWithProfile);
       setIsAuthenticated(true);
-      localStorage.setItem('pyp-auth', JSON.stringify({ user: userData }));
+      localStorage.setItem('pyp-auth', JSON.stringify({ user: userWithProfile }));
     } catch (error) {
       console.error('Error creating user profile:', error);
       // Still allow login even if profile creation fails
@@ -90,7 +90,8 @@ function App() {
           onAccountCreated={async (hederaAccount) => {
             try {
               // Save Hedera account to Supabase
-              await createHederaAccount(user.id, hederaAccount);
+              const profileId = user.profileId;
+              await createHederaAccount(profileId, hederaAccount);
               
               const updatedUser = { ...user, hederaAccount };
               setUser(updatedUser);

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './LoginScreen.css';
+import { AuthService } from './services/authService';
 
 const LoginScreen = ({ onLogin }) => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -35,19 +36,16 @@ const LoginScreen = ({ onLogin }) => {
         }
       }
 
-      // Simulate API call
-     // TODO: Replace with real backend or supabase
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Use AuthService for authentication
+      const { data, error } = isSignUp 
+        ? await AuthService.signUp(formData.email, formData.password, formData.name)
+        : await AuthService.signIn(formData.email, formData.password);
 
-      const userData = {
-        id: Date.now().toString(),
-        name: formData.name || formData.email.split('@')[0],
-        email: formData.email,
-        authType: 'email',
-        walletAddress: null
-      };
+      if (error) {
+        throw error;
+      }
 
-      onLogin(userData);
+      onLogin(data.user);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -60,27 +58,14 @@ const LoginScreen = ({ onLogin }) => {
     setError('');
 
     try {
-      // Check if HashPack is available
-      if (typeof window.hashconnect === 'undefined') {
-        throw new Error('HashPack wallet not found. Please install HashPack extension.');
+      // Use AuthService for HashPack authentication
+      const { data, error } = await AuthService.signInWithHashPack();
+
+      if (error) {
+        throw error;
       }
 
-      // Connect to HashPack
-      const result = await window.hashpack.connect();
-      
-      if (result.success) {
-        const userData = {
-          id: result.accountId,
-          name: result.accountId.slice(0, 8) + '...',
-          email: null,
-          authType: 'hashpack',
-          walletAddress: result.accountId
-        };
-
-        onLogin(userData);
-      } else {
-        throw new Error('Failed to connect to HashPack wallet');
-      }
+      onLogin(data.user);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -93,7 +78,7 @@ const LoginScreen = ({ onLogin }) => {
       <div className="login-container">
         <div className="login-header">
           <h1>Play Your Path (PYP)</h1>
-          <p>African-inspired adventures await</p>
+          <p>African-inspired adventures in the PYP Hub</p>
         </div>
 
         <div className="auth-tabs">

@@ -16,7 +16,7 @@ const UserProfile = ({ user, onClose }) => {
   const loadUserProfile = async () => {
     try {
       setLoading(true);
-      const userProfile = await getUserProfile(user.id);
+      const userProfile = await getUserProfile(user.profileId || user.id);
       setProfile(userProfile);
     } catch (err) {
       console.error('Error loading user profile:', err);

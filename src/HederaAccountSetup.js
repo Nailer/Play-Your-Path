@@ -62,7 +62,7 @@ const HederaAccountSetup = ({ user, onAccountCreated, onClose }) => {
                 <h3>Generate Your Hedera Account</h3>
                 <p>
                   This will create a new Hedera account for you to receive NFT rewards, 
-                  participate in governance, and trade tokens.
+                  participate in governance, and trade tokens in the PYP ecosystem.
                 </p>
                 <div className="warning-box">
                   <strong>⚠️ Important:</strong>

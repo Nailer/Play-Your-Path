@@ -11,9 +11,18 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // Database schema helpers
 export const createUserProfile = async (userData) => {
+  // Only send columns that exist; let DB generate UUID id
+  const insertData = {
+    email: userData.email,
+    name: userData.name,
+    auth_type: userData.auth_type,
+    wallet_address: userData.wallet_address,
+  };
+
+  // Upsert on email so repeated logins don't error
   const { data, error } = await supabase
     .from('user_profiles')
-    .insert([userData])
+    .upsert(insertData, { onConflict: 'email' })
     .select()
     .single();
 
@@ -21,14 +30,14 @@ export const createUserProfile = async (userData) => {
   return data;
 };
 
-export const getUserProfile = async (userId) => {
+export const getUserProfile = async (profileId) => {
   const { data, error } = await supabase
     .from('user_profiles')
     .select(`
       *,
       hedera_accounts (*)
     `)
-    .eq('id', userId)
+    .eq('id', profileId)
     .single();
 
   if (error) throw error;
@@ -47,11 +56,11 @@ export const updateUserProfile = async (userId, updates) => {
   return data;
 };
 
-export const createHederaAccount = async (userId, hederaData) => {
+export const createHederaAccount = async (userProfileId, hederaData) => {
   const { data, error } = await supabase
     .from('hedera_accounts')
     .insert([{
-      user_id: userId,
+      user_id: userProfileId,
       account_id: hederaData.accountId,
       evm_address: hederaData.evmAddress,
       public_key: hederaData.publicKey,
