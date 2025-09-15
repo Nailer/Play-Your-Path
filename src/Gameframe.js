@@ -12,7 +12,7 @@ export default function GameFrame() {
         name="iframe1" 
         id="iframe1"
         frameBorder="0"
-        style={{ border: "none", width: "100%", height: "calc(100vh - 60px)" }}
+        style={{ border: "none", width: "120%", height: "1000px" }}
       />
     </div>
   );

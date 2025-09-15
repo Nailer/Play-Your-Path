@@ -6,7 +6,7 @@
 
 /* Ensure iframe takes full available space */
 .app iframe {
-  width: 100% !important;
+  /* width: 100% !important; */
   height: calc(100vh - 60px) !important;
   border: none;
 }
