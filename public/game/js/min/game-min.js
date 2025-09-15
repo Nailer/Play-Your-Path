@@ -378,7 +378,7 @@ var game = {
         if ($.inArray("key", collected) === -1) {
           $("#teleport, #exit").hide();
           setTimeout(function () {
-            $("#player").text_cloud("Teleport!? ...", 2e3);
+            $("#player").text_cloud("Hedera's World !? ...", 2e3);
           }, 5e3);
         }
         $("#exit")

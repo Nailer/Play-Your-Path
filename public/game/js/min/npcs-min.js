@@ -51,28 +51,28 @@ var npc = {
             npc.fish.move_to_player($("#fish_click_area"));
             room.center(!0, 100);
             dialogue_box.display({
-              character: "Fish",
+              character: "Heden Fish",
               picture: "aquarium_fish_big.png",
               text: "Hello!",
-              options: ["Hi.", "I don't have time to talk with you."],
+              options: ["Hi.", "I'm still checking around Hedera."],
             });
             $("#options").on("click", "#option_1", function () {
               dialogue_box.destroy();
               npc.fish.move(!0);
-              $("#fish").text_cloud("Oh really? I have A LOT.", 8e3);
+              $("#fish").text_cloud("Oh really? Take your time, we have a lot to talk about Hedera.", 8e3);
             });
             $("#options").on("click", "#option_0", function () {
               dialogue_box.display({
-                character: "Fish",
+                character: "Heden Fish",
                 picture: "aquarium_fish_big.png",
-                text: "Tell me... Did you look through the window?",
+                text: "Tell me... Have you downloaded the Hashpack wallet on your device?",
                 options: ["Yes I did.", "No."],
               });
               $("#options").on("click", "#option_1", function () {
                 dialogue_box.destroy();
                 npc.fish.move(!0);
                 $("#fish").text_cloud(
-                  "So please take a look and tell me what did you see.",
+                  "So please go back to your room and check the picture by your bed",
                   1e4
                 );
                 $("#teleport, #exit").show("slow");
@@ -80,7 +80,7 @@ var npc = {
               $.inArray("window", fish) === -1
                 ? $("#options").on("click", "#option_0", function () {
                     dialogue_box.display({
-                      character: "Fish",
+                      character: "Heden Fish",
                       picture: "aquarium_fish_big.png",
                       text: "So what did you see then?",
                       options: ["..."],
@@ -97,7 +97,7 @@ var npc = {
                   })
                 : $("#options").on("click", "#option_0", function () {
                     dialogue_box.display({
-                      character: "Fish",
+                      character: "Heden Fish",
                       picture: "aquarium_fish_big.png",
                       text: "So what did you see than?",
                       options: ["Many flying... Objects?"],
