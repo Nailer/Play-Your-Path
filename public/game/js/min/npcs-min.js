@@ -77,19 +77,20 @@ var npc = {
                 );
                 $("#teleport, #exit").show("slow");
               });
-              $.inArray("window", fish) === -1
+              ////////////////////////
+              $.inArray("picture", fish) === -1
                 ? $("#options").on("click", "#option_0", function () {
                     dialogue_box.display({
                       character: "Heden Fish",
                       picture: "aquarium_fish_big.png",
-                      text: "So what did you see then?",
+                      text: "Good... Have you setup or imported a wallet already?",
                       options: ["..."],
                     });
                     $("#options").on("click", "#option_0", function () {
                       dialogue_box.destroy();
                       npc.fish.move(!0);
                       $("#fish").text_cloud(
-                        "Yeah. C'mon! Check that window.",
+                        "Yeah. C'mon! Check that picture and window.",
                         8e3
                       );
                       $("#teleport, #exit").show("slow");
@@ -99,7 +100,7 @@ var npc = {
                     dialogue_box.display({
                       character: "Heden Fish",
                       picture: "aquarium_fish_big.png",
-                      text: "So what did you see than?",
+                      text: "Good... Have you setup or imported a wallet already?",
                       options: ["Many flying... Objects?"],
                     });
                     $("#options").on("click", "#option_0", function () {
