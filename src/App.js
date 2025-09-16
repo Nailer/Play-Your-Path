@@ -1,14 +1,20 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
 import './App.css';
 import GameFrame from './Gameframe';
+import { AuthPage } from './AuthPage';
 
 
 function App() {
 
   return (
-    <div className="">
-      <GameFrame />
-    </div>
+    <BrowserRouter>
+      
+      <Routes>
+        <Route path="/" element={<GameFrame />} />
+        <Route path="/about" element={<AuthPage />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
