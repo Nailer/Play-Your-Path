@@ -117,6 +117,22 @@ var npc = {
                         options: ["Connect Wallet"],
                       });
                       $("#options").on("click", "#option_0", function () {
+                        dialogue_box.destroy();
+                        $("#fish_click_area").remove();
+                        $("#fish").text_cloud(
+                          "Wow. I have to check it out!",
+                          3e3
+                        );
+                        $("#fish")
+                          .stop(!0, !0)
+                          .delay(2e3)
+                          .animate({ opacity: 0 }, 3e3, function () {
+                            $(this).remove();
+                          });
+                        npc.fish.key();
+                        var a = $.jStorage.get("fish");
+                        a.push("disappear");
+                        $.jStorage.set("fish", a);
                         window.location.href = "/connect-wallet"
                       });
                     });
