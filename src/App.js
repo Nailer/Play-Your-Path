@@ -12,7 +12,7 @@ function App() {
       
       <Routes>
         <Route path="/" element={<GameFrame />} />
-        <Route path="/about" element={<AuthPage />} />
+        <Route path="/connect-wallet" element={<AuthPage />} />
       </Routes>
     </BrowserRouter>
   );

@@ -78,48 +78,67 @@ var npc = {
                 $("#teleport, #exit").show("slow");
               });
               ////////////////////////
-              $.inArray("picture", fish) === -1
+              $.inArray("window", fish) === -1
                 ? $("#options").on("click", "#option_0", function () {
                     dialogue_box.display({
                       character: "Heden Fish",
                       picture: "aquarium_fish_big.png",
-                      text: "Good... Have you setup or imported a wallet already?",
+                      text: "",
                       options: ["..."],
                     });
                     $("#options").on("click", "#option_0", function () {
                       dialogue_box.destroy();
                       npc.fish.move(!0);
                       $("#fish").text_cloud(
-                        "Yeah. C'mon! Check that picture and window.",
+                        "Yeah. C'mon! Go check that picture and window.",
                         8e3
                       );
                       $("#teleport, #exit").show("slow");
                     });
                   })
                 : $("#options").on("click", "#option_0", function () {
+                    // dialogue_box.display({
+                    //   character: "Heden Fish",
+                    //   picture: "aquarium_fish_big.png",
+                    //   text: "Good... Have you setup or imported a wallet already?",
+                    //   options: ["Many flying... Objects?"],
+                    // });
                     dialogue_box.display({
                       character: "Heden Fish",
                       picture: "aquarium_fish_big.png",
-                      text: "Good... Have you setup or imported a wallet already?",
-                      options: ["Many flying... Objects?"],
+                      text: "Have you imported or created a wallet?",
+                      options: ["I already setup my wallet.", "No, I want to do that now"],
                     });
                     $("#options").on("click", "#option_0", function () {
-                      dialogue_box.destroy();
-                      $("#fish_click_area").remove();
-                      $("#fish").text_cloud(
-                        "Wow. I have to check it out!",
-                        3e3
-                      );
-                      $("#fish")
-                        .stop(!0, !0)
-                        .delay(2e3)
-                        .animate({ opacity: 0 }, 3e3, function () {
-                          $(this).remove();
-                        });
-                      npc.fish.key();
-                      var a = $.jStorage.get("fish");
-                      a.push("disappear");
-                      $.jStorage.set("fish", a);
+                      dialogue_box.display({
+                        character: "Heden Fish",
+                        picture: "aquarium_fish_big.png",
+                        text: "Good... Now you have to connect your wallet to interact with Hedera and mint your NFT rewards.",
+                        options: ["Connect Wallet"],
+                      });
+                      $("#options").on("click", "#option_0", function () {
+                        window.location.href = "/connect-wallet"
+                      });
+                    });
+                    $("#options").on("click", "#option_1", function () {
+                      // dialogue_box.destroy();
+                      // $("#fish_click_area").remove();
+                      // $("#fish").text_cloud(
+                      //   "Wow. I have to check it out!",
+                      //   3e3
+                      // );
+                      // $("#fish")
+                      //   .stop(!0, !0)
+                      //   .delay(2e3)
+                      //   .animate({ opacity: 0 }, 3e3, function () {
+                      //     $(this).remove();
+                      //   });
+                      // npc.fish.key();
+                      // var a = $.jStorage.get("fish");
+                      // a.push("disappear");
+                      // $.jStorage.set("fish", a);
+                      window.open("https://www.hashpack.app/post/how-to-create-your-first-account-with-hashpack", "_blank");
+                      // window.location.href = "https://www.hashpack.app/post/how-to-create-your-first-account-with-hashpack";
                     });
                   });
             });
