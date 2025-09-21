@@ -8,6 +8,20 @@
   /* intro - END */
 
 }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden; /* optional, prevents scrolling */
+}
+
+#root {
+  height: 100%;
+  width: 100%;
+}
+
 #intro .head {
   width: 343px;
   height: 460px;

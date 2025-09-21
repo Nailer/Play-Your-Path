@@ -57,19 +57,19 @@ var scene = {
       setTimeout(function () {
         $("<span/>", { id: "message_1", class: "message" })
           .appendTo("#corridor")
-          .text("Come downstairs...")
+          .text("Hedera is the only public ledger...")
           .hide()
           .fadeIn(1e3, function () {
             $(this).fadeOut(2e3);
             $("<span/>", { id: "message_2", class: "message" })
               .appendTo("#corridor")
-              .text("NOW!")
+              .text("that uses hashgraph consensus...")
               .hide()
               .fadeIn(1e3, function () {
                 $(this).fadeOut(2e3);
                 $("<span/>", { id: "message_3", class: "message" })
                   .appendTo("#corridor")
-                  .text("Merge with me.")
+                  .text("a faster, more secure alternative to blockchain")
                   .hide()
                   .fadeIn(1e3)
                   .fadeOut(2e3, function () {
