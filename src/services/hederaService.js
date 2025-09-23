@@ -4,6 +4,13 @@ import {
   PrivateKey,
   Hbar,
   AccountId,
+  TokenCreateTransaction,
+  TokenType,
+  TokenSupplyType,
+  TokenMintTransaction,
+  TokenAssociateTransaction,
+  TransferTransaction,
+  TokenId,
 } from '@hashgraph/sdk';
 
 // Hedera service for creating real accounts on testnet
@@ -133,6 +140,152 @@ export class HederaService {
       this.client = null;
     }
   }
+
+  // ================================
+  //           TOKENS / NFTS
+  // ================================
+
+  /**
+   * Create a fungible token (HBAR-like) on Hedera.
+   * Returns { tokenId: string }
+   */
+  async createFungibleToken({ name, symbol, decimals = 8, initialSupply = 0 }) {
+    if (!this.client) this.initializeClient();
+
+    const adminKey = PrivateKey.fromString(this.operatorKey);
+
+    const tx = await new TokenCreateTransaction()
+      .setTokenName(name)
+      .setTokenSymbol(symbol)
+      .setTreasuryAccountId(AccountId.fromString(this.operatorId))
+      .setAdminKey(adminKey.publicKey)
+      .setSupplyKey(adminKey.publicKey)
+      .setDecimals(decimals)
+      .setInitialSupply(initialSupply)
+      .setTokenType(TokenType.FungibleCommon)
+      .setSupplyType(TokenSupplyType.Infinite)
+      .freezeWith(this.client)
+      .sign(adminKey);
+
+    const submit = await tx.execute(this.client);
+    const receipt = await submit.getReceipt(this.client);
+    const tokenId = receipt.tokenId;
+
+    if (!tokenId) throw new Error('Failed to create fungible token');
+    return { tokenId: tokenId.toString() };
+  }
+
+  /**
+   * Mint additional fungible supply.
+   */
+  async mintFungible({ tokenId, amount }) {
+    if (!this.client) this.initializeClient();
+    const supplyKey = PrivateKey.fromString(this.operatorKey);
+
+    const tx = await new TokenMintTransaction()
+      .setTokenId(TokenId.fromString(tokenId))
+      .setAmount(amount)
+      .freezeWith(this.client)
+      .sign(supplyKey);
+
+    const submit = await tx.execute(this.client);
+    await submit.getReceipt(this.client);
+    return { tokenId };
+  }
+
+  /**
+   * Create a Non-Fungible Token (collection). Returns { tokenId }
+   */
+  async createNftCollection({ name, symbol, maxSupply = 0 /* 0 = infinite */ }) {
+    if (!this.client) this.initializeClient();
+    const adminKey = PrivateKey.fromString(this.operatorKey);
+
+    const tx = await new TokenCreateTransaction()
+      .setTokenName(name)
+      .setTokenSymbol(symbol)
+      .setTreasuryAccountId(AccountId.fromString(this.operatorId))
+      .setAdminKey(adminKey.publicKey)
+      .setSupplyKey(adminKey.publicKey)
+      .setTokenType(TokenType.NonFungibleUnique)
+      .setSupplyType(maxSupply > 0 ? TokenSupplyType.Finite : TokenSupplyType.Infinite)
+      .setMaxSupply(maxSupply > 0 ? maxSupply : null)
+      .freezeWith(this.client)
+      .sign(adminKey);
+
+    const submit = await tx.execute(this.client);
+    const receipt = await submit.getReceipt(this.client);
+    const tokenId = receipt.tokenId;
+
+    if (!tokenId) throw new Error('Failed to create NFT collection');
+    return { tokenId: tokenId.toString() };
+  }
+
+  /**
+   * Mint NFTs with metadata list (array of Uint8Array or Buffer of bytes).
+   * Returns { tokenId, serials: number[] }
+   */
+  async mintNfts({ tokenId, metadataList }) {
+    if (!this.client) this.initializeClient();
+    const supplyKey = PrivateKey.fromString(this.operatorKey);
+
+    const tx = await new TokenMintTransaction()
+      .setTokenId(TokenId.fromString(tokenId))
+      .setMetadata(metadataList)
+      .freezeWith(this.client)
+      .sign(supplyKey);
+
+    const submit = await tx.execute(this.client);
+    const receipt = await submit.getReceipt(this.client);
+    const serials = receipt.serials ? receipt.serials.map(s => Number(s)) : [];
+    return { tokenId, serials };
+  }
+
+  /**
+   * Associate a token/NFT to an account (so it can receive it).
+   */
+  async associateToken({ accountId, accountPrivateKey, tokenId }) {
+    if (!this.client) this.initializeClient();
+    const userKey = PrivateKey.fromString(accountPrivateKey);
+
+    const tx = await new TokenAssociateTransaction()
+      .setAccountId(AccountId.fromString(accountId))
+      .setTokenIds([TokenId.fromString(tokenId)])
+      .freezeWith(this.client)
+      .sign(userKey);
+
+    const submit = await tx.execute(this.client);
+    await submit.getReceipt(this.client);
+    return { accountId, tokenId };
+  }
+
+  /**
+   * Transfer fungible tokens or a single NFT serial from treasury to user.
+   * For NFTs, provide serial number via tokenId like `0.0.x@serial` or use the nftSerial param.
+   */
+  async transferToken({ tokenId, amount = 0, fromAccountId, toAccountId, nftSerial }) {
+    if (!this.client) this.initializeClient();
+
+    const fromId = AccountId.fromString(fromAccountId || this.operatorId);
+    const fromKey = PrivateKey.fromString(this.operatorKey);
+    const toId = AccountId.fromString(toAccountId);
+
+    let tx = new TransferTransaction();
+
+    if (nftSerial) {
+      // NFT transfer
+      const nftId = TokenId.fromString(tokenId).toNonFungibleToken(nftSerial);
+      tx = tx.addNftTransfer(nftId, fromId, toId);
+    } else {
+      // Fungible transfer (amount in smallest units according to decimals)
+      tx = tx.addTokenTransfer(TokenId.fromString(tokenId), fromId, -amount)
+             .addTokenTransfer(TokenId.fromString(tokenId), toId, amount);
+    }
+
+    const frozen = await tx.freezeWith(this.client).sign(fromKey);
+    const submit = await frozen.execute(this.client);
+    await submit.getReceipt(this.client);
+    return { tokenId, to: toId.toString(), amount, nftSerial: nftSerial || null };
+  }
 }
 
 // Create a singleton instance
@@ -145,4 +298,22 @@ export const createHederaAccount = async () => {
 
 export const getAccountBalance = async (accountId) => {
   return await hederaService.getAccountBalance(accountId);
+};
+
+// Convenience wrappers for badges and rewards
+export const createBadgeCollection = async ({ name = 'PYP Badge', symbol = 'PYPB', maxSupply = 0 }) => {
+  return await hederaService.createNftCollection({ name, symbol, maxSupply });
+};
+
+export const mintBadgeNfts = async ({ tokenId, metadataJsonArray }) => {
+  // Convert JSON metadata strings to bytes
+  const metadataList = metadataJsonArray.map((m) => Buffer.from(typeof m === 'string' ? m : JSON.stringify(m)));
+  return await hederaService.mintNfts({ tokenId, metadataList });
+};
+
+export const rewardFungibleTokens = async ({ name = 'PYP Reward', symbol = 'PYPR', decimals = 8, initialSupply = 0, toAccountId, amount }) => {
+  // Create token if needed externally; here just an example of mint+transfer if token exists
+  // This function assumes the token already exists and is associated by the recipient
+  // Consider persisting tokenId in Supabase and passing it here
+  throw new Error('Implement reward flow by persisting tokenId and calling mintFungible + transferToken');
 };
