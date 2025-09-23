@@ -133,6 +133,7 @@ var game = {
           $("#picture_winter").css("background", "none");
           $("#plant").removeClass("small");
         }
+        /////////////////////////////////////////////////////////////////////////////////
         $("#door_exit").click(function () {
           room.the_player.go_to.start({
             target: "6-18",
@@ -708,6 +709,7 @@ var game = {
               },
             });
           });
+        //////////////////////////////////////////////////////////////
         $("#window").click(function () {
           room.the_player.go_to.start({
             target: "0-2",
@@ -1300,6 +1302,7 @@ var game = {
         room.pulse($("#glow"), 5e3);
         $("#door_kitchen").tooltip("left");
         $("#window").tooltip("left");
+        ////////////////////////////////////// kitchen window  ////////////////////////
         $("#window").click(function () {
           room.the_player.go_to.start({
             target: "2-0",

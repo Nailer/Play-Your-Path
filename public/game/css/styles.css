@@ -4174,18 +4174,18 @@ html, body {
 
 }
 .corridor #start_room_view {
-  width: 300px;
-  height: 269px;
-  top: -17%;
-  left: -4%;
+  width: 500px;
+  height: 469px;
+  top: 17%;
+  left: 4%;
   z-index: 4;
   background: url(../images/room_view.png);
 }
 .corridor #aquarium_view {
-  width: 244px;
+  width: 544px;
   height: 461px;
   left: 53%;
-  top: -30%;
+  top: 30%;
   right: 10%;
   z-index: 1;
   background: url(../images/aquarium_view_2.png);
@@ -4231,7 +4231,7 @@ html, body {
   right: -47px;
   bottom: 132px;
   z-index: 1;
-  -moz-transform-origin: 79px 212px;
+  -moz-transform-origin: 79px 212px;  
   -webkit-transform-origin: 79px 212px;
   -o-transform-origin: 79px 212px;
   -ms-transform-origin: 79px 212px;
