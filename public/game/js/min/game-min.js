@@ -133,6 +133,7 @@ var game = {
           $("#picture_winter").css("background", "none");
           $("#plant").removeClass("small");
         }
+        /////////////////////////////////////////////////////////////////////////////////
         $("#door_exit").click(function () {
           room.the_player.go_to.start({
             target: "6-18",
@@ -378,7 +379,7 @@ var game = {
         if ($.inArray("key", collected) === -1) {
           $("#teleport, #exit").hide();
           setTimeout(function () {
-            $("#player").text_cloud("Teleport!? ...", 2e3);
+            $("#player").text_cloud("Hedera's World !? ...", 2e3);
           }, 5e3);
         }
         $("#exit")
@@ -708,6 +709,7 @@ var game = {
               },
             });
           });
+        //////////////////////////////////////////////////////////////
         $("#window").click(function () {
           room.the_player.go_to.start({
             target: "0-2",
@@ -1300,6 +1302,7 @@ var game = {
         room.pulse($("#glow"), 5e3);
         $("#door_kitchen").tooltip("left");
         $("#window").tooltip("left");
+        ////////////////////////////////////// kitchen window  ////////////////////////
         $("#window").click(function () {
           room.the_player.go_to.start({
             target: "2-0",
