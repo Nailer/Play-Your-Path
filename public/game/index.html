@@ -83,11 +83,22 @@ var tradeBtn = mkBtn('Trade', function(){ window.postMessage({type:'PYP_MODE', m
 var governBtn = mkBtn('Govern', function(){ window.postMessage({type:'PYP_MODE', mode:'govern'}, '*'); });
 var teleportBtn = mkBtn('Teleport', function(){ window.location.href = 'village.html'; });
 
+// Summon/Invade buttons
+var summonBtn = mkBtn('Summon Friend', function(){ 
+    window.postMessage({type:'PYP_SUMMON', action:'create'}, '*'); 
+});
+var joinBtn = mkBtn('Join Code', function(){ 
+    var code = prompt('Enter invite code:');
+    if (code) window.postMessage({type:'PYP_SUMMON', action:'join', code: code}, '*'); 
+});
+
 pypOverlay.appendChild(learnBtn);
 pypOverlay.appendChild(playBtn);
 pypOverlay.appendChild(tradeBtn);
 pypOverlay.appendChild(governBtn);
 pypOverlay.appendChild(teleportBtn);
+pypOverlay.appendChild(summonBtn);
+pypOverlay.appendChild(joinBtn);
 
 document.body.appendChild(pypOverlay);
 
@@ -96,6 +107,20 @@ window.PYP = window.PYP || {};
 window.PYP.login = function(provider){ console.log('Hedera login placeholder', provider); };
 window.PYP.mintBadge = function(badgeId){ console.log('Mint NFT badge placeholder', badgeId); };
 window.PYP.rewardTokens = function(amount){ console.log('Reward tokens placeholder', amount); };
+
+// Summon/Quest hooks
+window.PYP.createSummon = function(kind){ 
+    return window.parent.postMessage({type:'PYP_SUMMON_CREATE', kind: kind}, '*'); 
+};
+window.PYP.joinSummon = function(code){ 
+    return window.parent.postMessage({type:'PYP_SUMMON_JOIN', code: code}, '*'); 
+};
+window.PYP.assignQuest = function(questCode){ 
+    return window.parent.postMessage({type:'PYP_QUEST_ASSIGN', questCode: questCode}, '*'); 
+};
+window.PYP.completeQuest = function(questCode){ 
+    return window.parent.postMessage({type:'PYP_QUEST_COMPLETE', questCode: questCode}, '*'); 
+};
 
 </script>
 

@@ -56,6 +56,177 @@ export const updateUserProfile = async (userId, updates) => {
   return data;
 };
 
+// Token balances
+export const upsertTokenBalance = async ({ userId, tokenId, tokenSymbol, balance }) => {
+  const { data, error } = await supabase
+    .from('user_token_balances')
+    .upsert({ user_id: userId, token_id: tokenId, token_symbol: tokenSymbol, balance })
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+};
+
+export const getTokenBalances = async (userId) => {
+  const { data, error } = await supabase
+    .from('user_token_balances')
+    .select('*')
+    .eq('user_id', userId);
+  if (error) throw error;
+  return data || [];
+};
+
+// Daily points
+export const getDailyPoints = async (userId) => {
+  const { data, error } = await supabase
+    .from('user_daily_points')
+    .select('*')
+    .eq('user_id', userId)
+    .single();
+  if (error && error.code !== 'PGRST116') throw error;
+  return data || { user_id: userId, points: 0, last_claimed_date: null };
+};
+
+export const updateDailyPoints = async (userId, { points, last_claimed_date }) => {
+  const { data, error } = await supabase
+    .from('user_daily_points')
+    .upsert({ user_id: userId, points, last_claimed_date })
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+};
+
+// Friends
+export const sendFriendRequest = async ({ requesterId, addresseeEmail }) => {
+  // Find addressee by email
+  const { data: user, error: uerr } = await supabase
+    .from('user_profiles')
+    .select('id')
+    .eq('email', addresseeEmail)
+    .single();
+  if (uerr) throw uerr;
+
+  const { data, error } = await supabase
+    .from('user_friends')
+    .upsert({ requester_id: requesterId, addressee_id: user.id, status: 'pending' }, { onConflict: 'requester_id,addressee_id' })
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+};
+
+export const respondFriendRequest = async ({ requesterId, addresseeId, accept }) => {
+  const { data, error } = await supabase
+    .from('user_friends')
+    .update({ status: accept ? 'accepted' : 'blocked' })
+    .eq('requester_id', requesterId)
+    .eq('addressee_id', addresseeId)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+};
+
+export const listFriends = async (userId) => {
+  const { data, error } = await supabase
+    .from('user_friends')
+    .select('*')
+    .or(`requester_id.eq.${userId},addressee_id.eq.${userId}`)
+    .eq('status', 'accepted');
+  if (error) throw error;
+  return data || [];
+};
+
+// Messages
+export const sendMessage = async ({ senderId, recipientId, content }) => {
+  const { data, error } = await supabase
+    .from('user_messages')
+    .insert({ sender_id: senderId, recipient_id: recipientId, content })
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+};
+
+export const fetchInbox = async (userId) => {
+  const { data, error } = await supabase
+    .from('user_messages')
+    .select('*')
+    .eq('recipient_id', userId)
+    .order('sent_at', { ascending: false });
+  if (error) throw error;
+  return (data || []);
+};
+
+// Summons
+export const createSummon = async ({ ownerId, targetId, kind = 'summon', ttlMinutes = 15 }) => {
+  const invite = Math.random().toString(36).slice(2, 10);
+  const expires = new Date(Date.now() + ttlMinutes * 60000).toISOString();
+  const { data, error } = await supabase
+    .from('summons')
+    .insert({ invite_code: invite, owner_id: ownerId, target_id: targetId || null, kind, expires_at: expires })
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+};
+
+export const getSummonByCode = async (code) => {
+  const { data, error } = await supabase
+    .from('summons')
+    .select('*')
+    .eq('invite_code', code)
+    .single();
+  if (error) throw error;
+  return data;
+};
+
+export const acceptSummon = async (code) => {
+  const { data, error } = await supabase
+    .from('summons')
+    .update({ status: 'accepted' })
+    .eq('invite_code', code)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+};
+
+// Quests
+export const assignQuest = async ({ userId, questCode }) => {
+  const { data: quest, error: qErr } = await supabase
+    .from('quests')
+    .select('id')
+    .eq('code', questCode)
+    .single();
+  if (qErr) throw qErr;
+  const { data, error } = await supabase
+    .from('user_quests')
+    .upsert({ user_id: userId, quest_id: quest.id })
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+};
+
+export const completeQuest = async ({ userId, questCode }) => {
+  const { data: quest, error: qErr } = await supabase
+    .from('quests')
+    .select('id, reward_points')
+    .eq('code', questCode)
+    .single();
+  if (qErr) throw qErr;
+  const { data, error } = await supabase
+    .from('user_quests')
+    .update({ completed_at: new Date().toISOString() })
+    .eq('user_id', userId)
+    .eq('quest_id', quest.id)
+    .select()
+    .single();
+  if (error) throw error;
+  return { ...data, reward_points: quest.reward_points };
+};
 export const createHederaAccount = async (userProfileId, hederaData) => {
   const { data, error } = await supabase
     .from('hedera_accounts')

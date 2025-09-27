@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './UserProfile.css';
-import { getUserProfile, updateHederaBalance } from '../lib/supabase';
+import { getUserProfile, updateHederaBalance, getTokenBalances, getDailyPoints, listFriends, fetchInbox } from '../lib/supabase';
 import { getAccountBalance } from '../services/hederaService';
 
 const UserProfile = ({ user, onClose }) => {
@@ -8,6 +8,10 @@ const UserProfile = ({ user, onClose }) => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
+  const [balances, setBalances] = useState([]);
+  const [daily, setDaily] = useState(null);
+  const [friends, setFriends] = useState([]);
+  const [inbox, setInbox] = useState([]);
 
   useEffect(() => {
     loadUserProfile();
@@ -18,6 +22,16 @@ const UserProfile = ({ user, onClose }) => {
       setLoading(true);
       const userProfile = await getUserProfile(user.profileId || user.id);
       setProfile(userProfile);
+      const [bals, dp, fr, ib] = await Promise.all([
+        getTokenBalances(user.profileId || user.id),
+        getDailyPoints(user.profileId || user.id),
+        listFriends(user.profileId || user.id),
+        fetchInbox(user.profileId || user.id)
+      ]);
+      setBalances(bals);
+      setDaily(dp);
+      setFriends(fr);
+      setInbox(ib);
     } catch (err) {
       console.error('Error loading user profile:', err);
       setError('Failed to load user profile');
@@ -137,8 +151,22 @@ const UserProfile = ({ user, onClose }) => {
                   </div>
                   <div className="balance-label">Current Balance</div>
                 </div>
-                
                 <div className="info-grid">
+                  <div className="info-item">
+                    <label>Tier</label>
+                    <span>{profile?.tier || 'bronze'}</span>
+                  </div>
+                  <div className="info-item">
+                    <label>XP</label>
+                    <span>{profile?.xp || 0}</span>
+                  </div>
+                  <div className="info-item">
+                    <label>Daily Points</label>
+                    <span>{daily?.points || 0}</span>
+                  </div>
+                </div>
+
+                <div className="info-grid" style={{ marginTop: '12px' }}>
                   <div className="info-item">
                     <label>Account ID</label>
                     <span className="account-id">
@@ -158,6 +186,20 @@ const UserProfile = ({ user, onClose }) => {
                     </span>
                   </div>
                 </div>
+
+                {balances?.length > 0 && (
+                  <div className="profile-section" style={{ marginTop: '16px' }}>
+                    <h3>Tokens</h3>
+                    <div className="info-grid">
+                      {balances.map((t) => (
+                        <div key={t.token_id} className="info-item">
+                          <label>{t.token_symbol || t.token_id}</label>
+                          <span>{Number(t.balance).toFixed(4)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -172,6 +214,34 @@ const UserProfile = ({ user, onClose }) => {
             </div>
           )}
         </div>
+
+        {friends && friends.length > 0 && (
+          <div className="profile-section">
+            <h3>Friends</h3>
+            <div className="info-grid">
+              {friends.map((f) => (
+                <div key={f.id} className="info-item">
+                  <label>Status</label>
+                  <span>{f.status}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {inbox && inbox.length > 0 && (
+          <div className="profile-section">
+            <h3>Messages</h3>
+            <div className="info-grid">
+              {inbox.map((m) => (
+                <div key={m.id} className="info-item">
+                  <label>{new Date(m.sent_at).toLocaleString()}</label>
+                  <span>{m.content}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

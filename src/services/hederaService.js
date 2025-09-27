@@ -17,8 +17,14 @@ import {
 export class HederaService {
   constructor() {
     this.client = null;
-    this.operatorId = process.env.REACT_APP_HEDERA_OPERATOR_ID;
-    this.operatorKey = process.env.REACT_APP_HEDERA_OPERATOR_KEY;
+    // Support multiple env names for convenience (samples/other stacks)
+    this.operatorId = process.env.REACT_APP_HEDERA_OPERATOR_ID
+      || process.env.MY_ACCOUNT_ID
+      || process.env.NEXT_PUBLIC_MY_ACCOUNT_ID;
+    this.operatorKey = process.env.REACT_APP_HEDERA_OPERATOR_KEY
+      || process.env.MY_PRIVATE_KEY
+      || process.env.NEXT_PUBLIC_MY_PRIVATE_KEY;
+    this.rewardTokenId = process.env.REACT_APP_PYP_REWARD_TOKEN_ID || null; // optional persisted reward token
   }
 
   // Initialize the Hedera client
@@ -286,6 +292,31 @@ export class HederaService {
     await submit.getReceipt(this.client);
     return { tokenId, to: toId.toString(), amount, nftSerial: nftSerial || null };
   }
+
+  /**
+   * Send HBAR from a sender (defaults to operator) to a recipient.
+   */
+  async sendHbar({ senderAccountId, senderPrivateKey, receiverAccountId, amount, memo }) {
+    if (!receiverAccountId || !amount || amount <= 0) {
+      throw new Error('Invalid input parameters for HBAR transfer');
+    }
+    const fromId = AccountId.fromString(senderAccountId || this.operatorId);
+    const fromKey = PrivateKey.fromString(senderPrivateKey || this.operatorKey);
+    if (!this.client) this.initializeClient();
+
+    const tx = new TransferTransaction()
+      .addHbarTransfer(fromId, new Hbar(-amount))
+      .addHbarTransfer(AccountId.fromString(receiverAccountId), new Hbar(amount));
+    if (memo) tx.setTransactionMemo(memo);
+
+    const signed = await tx.freezeWith(this.client).sign(fromKey);
+    const res = await signed.execute(this.client);
+    const receipt = await res.getReceipt(this.client);
+    const txId = res.transactionId.toString();
+    const status = receipt.status.toString();
+    const hashscanUrl = `https://hashscan.io/testnet/transaction/${txId}`;
+    return { transactionId: txId, status, hashscanUrl };
+  }
 }
 
 // Create a singleton instance
@@ -299,6 +330,48 @@ export const createHederaAccount = async () => {
 export const getAccountBalance = async (accountId) => {
   return await hederaService.getAccountBalance(accountId);
 };
+
+// SAMPLE-COMPAT WRAPPERS (matching the user-provided signatures)
+export async function createFungibleToken(input) {
+  // input: { tokenName, tokenSymbol, initialSupply, decimals? }
+  const res = await hederaService.createFungibleToken({
+    name: input.tokenName,
+    symbol: input.tokenSymbol,
+    initialSupply: input.initialSupply,
+    decimals: input.decimals ?? 2,
+  });
+  return { tokenId: res.tokenId };
+}
+
+export async function createNftAndMint(input) {
+  // input: { tokenName, tokenSymbol, maxSupply, metadataCids[] }
+  const { tokenId } = await hederaService.createNftCollection({
+    name: input.tokenName,
+    symbol: input.tokenSymbol,
+    maxSupply: input.maxSupply,
+  });
+  const metadataList = (input.metadataCids || []).map((c) => Buffer.from(c));
+  const minted = await hederaService.mintNfts({ tokenId, metadataList });
+  return { tokenId, mintedSerials: minted.serials };
+}
+
+export async function mintCertificateNFT(input) {
+  // Uses a pre-deployed NFT token id as the "certificate" collection
+  const certificateTokenId = process.env.CERTIFICATE_CONTRACT_ID || process.env.REACT_APP_CERTIFICATE_TOKEN_ID;
+  if (!certificateTokenId) throw new Error('Missing CERTIFICATE token id env: CERTIFICATE_CONTRACT_ID');
+  const minted = await hederaService.mintNfts({
+    tokenId: certificateTokenId,
+    metadataList: [Buffer.from(input.metadataUrl)],
+  });
+  if (!minted.serials || minted.serials.length === 0) {
+    throw new Error('Failed to mint certificate NFT');
+  }
+  return { tokenId: certificateTokenId, serialNumber: minted.serials[0] };
+}
+
+export async function sendHbar(input) {
+  return await hederaService.sendHbar(input);
+}
 
 // Convenience wrappers for badges and rewards
 export const createBadgeCollection = async ({ name = 'PYP Badge', symbol = 'PYPB', maxSupply = 0 }) => {
