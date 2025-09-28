@@ -785,7 +785,7 @@ var game = {
             target: "18-6",
             action: function () {
               sound_door.play();
-              game.bathroom(5, 0);
+              game.room(5, 0);
             },
           });
         });
@@ -1311,7 +1311,7 @@ var game = {
                 [
                   ["big_room_view", "5000", "5"],
                   ["start_room_view", 3e3, -3],
-                  ["bathroom_view", 1589, -2],
+                  // ["bathroom_view", 1589, -2],
                 ],
                 function () {
                   if ($.inArray("scene_explosion", played) === -1) {

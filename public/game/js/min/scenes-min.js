@@ -13,19 +13,19 @@ var scene = {
             $(this).fadeOut(2e3);
             $("<span/>", { id: "message_2", class: "message" })
               .appendTo("#intro")
-              .text("Hello!")
+              .text("Don't be surprised! You will learn about Hedera, Hashpack and Hashgraph in this game")
               .hide()
               .fadeIn(2e3, function () {
                 $(this).fadeOut(2e3);
                 $("<span/>", { id: "message_3", class: "message" })
                   .appendTo("#intro")
-                  .text("I hope he's alive...")
+                  .text("This is a game that teaches you all you need to know about Hedera...")
                   .hide()
                   .fadeIn(5e3)
                   .fadeOut(5e3);
                 $("<span/>", { id: "message_4", class: "message player" })
                   .appendTo("#intro")
-                  .text("What?!")
+                  .text("What?...")
                   .hide()
                   .fadeIn(500)
                   .fadeOut(5e3, function () {
@@ -420,11 +420,11 @@ var scene = {
         };
         i(r);
         setTimeout(function () {
-          r.text_cloud("It's so nice outside!", 2e3);
+          r.text_cloud("Ensure to mint your NFT as you progress in the game", 2e3);
         }, 1e3);
         setTimeout(function () {
           r.stop(!0).animate({ left: 550, top: 320 }, 1e3, function () {
-            r.spState(1).text_cloud("Thank you man!", 2e3);
+            r.spState(1).text_cloud("...and don't forget about the daily plant claim in your room", 2e3);
             t.fadeIn(1e3);
             $("#tree").fadeOut(1e3);
             $("body").animate({ backgroundColor: "#000000" }, 1e3);
