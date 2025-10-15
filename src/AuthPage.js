@@ -4,12 +4,15 @@ import LoginScreen from "./LoginScreen";
 import HederaAccountSetup from "./HederaAccountSetup";
 import UserProfile from "./components/UserProfile";
 import { createUserProfile, createHederaAccount } from "./lib/supabase";
+import { initHashConnect } from "./utils/hashconnect";
+import CreateTokenForm from "./components/CreateTokenForm";
 
 export const AuthPage = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
   const [showHederaSetup, setShowHederaSetup] = useState(false);
   const [showUserProfile, setShowUserProfile] = useState(false);
+  const [accountId, setAccountId] = useState(null);
 
   useEffect(() => {
     // Check for existing auth state
@@ -23,6 +26,25 @@ export const AuthPage = () => {
         localStorage.removeItem("pyp-auth");
       }
     }
+  }, []);
+
+  ////////////////////////////// hashconnect useEffect /////////////////////////////
+  useEffect(() => {
+    const connectWallet = async () => {
+      const hashconnect = await initHashConnect({
+        name: "My Hedera dApp",
+        description: "Learn & earn with Hedera",
+        icon: "https://hedera.com/favicon.ico",
+        url: "http://localhost:3000",
+      });
+
+      hashconnect.pairingEvent.on((pairingData) => {
+        setAccountId(pairingData.accountIds[0]);
+        console.log("✅ Wallet connected:", pairingData.accountIds[0]);
+      });
+    };
+
+    connectWallet();
   }, []);
 
   const handleLogin = async (userData) => {
@@ -117,6 +139,15 @@ export const AuthPage = () => {
       {showUserProfile && (
         <UserProfile user={user} onClose={() => setShowUserProfile(false)} />
       )}
+
+      <div>
+        <h1>🚀 Hedera Token Creator</h1>
+        {accountId ? (
+          <CreateTokenForm />
+        ) : (
+          <p>Please connect your HashPack wallet to continue.</p>
+        )}
+      </div>
     </div>
   );
 };
