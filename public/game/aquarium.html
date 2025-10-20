@@ -101,6 +101,13 @@
 						window.PYP.assignQuest('FISH_DAILY_1');
 					}
 				}
+				
+				// Demo: Auto-complete quest after asking about it
+				if(q.toLowerCase().includes('complete') || q.toLowerCase().includes('done')){
+					if(window.PYP && window.PYP.completeQuest){
+						window.PYP.completeQuest('FISH_DAILY_1');
+					}
+				}
 			});
 		})();
 		</script>

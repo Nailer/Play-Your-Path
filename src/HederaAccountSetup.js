@@ -1,6 +1,19 @@
 import React, { useState } from 'react';
 import './HederaAccountSetup.css';
 import { createHederaAccount } from './services/hederaService';
+import { 
+  FaWallet, 
+  FaCopy, 
+  FaEye, 
+  FaEyeSlash, 
+  FaExclamationTriangle, 
+  FaCheckCircle, 
+  FaSpinner, 
+  FaTimes,
+  FaKey,
+  FaCoins,
+  FaExternalLinkAlt
+} from 'react-icons/fa';
 
 const HederaAccountSetup = ({ user, onAccountCreated, onClose }) => {
   const [isGenerating, setIsGenerating] = useState(false);
@@ -51,8 +64,13 @@ const HederaAccountSetup = ({ user, onAccountCreated, onClose }) => {
     <div className="hedera-setup-overlay">
       <div className="hedera-setup-modal">
         <div className="hedera-setup-header">
-          <h2>Create Hedera Account</h2>
-          <button className="close-btn" onClick={onClose}>×</button>
+          <div className="header-title">
+            <FaWallet className="header-icon" />
+            <h2>Create Hedera Account</h2>
+          </div>
+          <button className="close-btn" onClick={onClose}>
+            <FaTimes />
+          </button>
         </div>
 
         <div className="hedera-setup-content">
@@ -65,13 +83,16 @@ const HederaAccountSetup = ({ user, onAccountCreated, onClose }) => {
                   participate in governance, and trade tokens in the PYP ecosystem.
                 </p>
                 <div className="warning-box">
-                  <strong>⚠️ Important:</strong>
+                  <strong>
+                    <FaExclamationTriangle className="warning-icon" />
+                    Important:
+                  </strong>
                   <ul>
-                    <li>Your private key will be shown only once</li>
-                    <li>Save it securely - we cannot recover it</li>
-                    <li>Never share your private key with anyone</li>
-                    <li>This creates a real account on Hedera testnet</li>
-                    <li>Account will be funded with 20 HBAR automatically</li>
+                    <li><FaKey className="list-icon" /> Your private key will be shown only once</li>
+                    <li><FaExclamationTriangle className="list-icon" /> Save it securely - we cannot recover it</li>
+                    <li><FaExclamationTriangle className="list-icon" /> Never share your private key with anyone</li>
+                    <li><FaExternalLinkAlt className="list-icon" /> This creates a real account on Hedera testnet</li>
+                    <li><FaCoins className="list-icon" /> Account will be funded with 20 HBAR automatically</li>
                   </ul>
                 </div>
               </div>
@@ -83,18 +104,24 @@ const HederaAccountSetup = ({ user, onAccountCreated, onClose }) => {
               >
                 {isGenerating ? (
                   <>
-                    <div className="spinner"></div>
+                    <FaSpinner className="spinner-icon" />
                     Generating Account...
                   </>
                 ) : (
-                  'Generate Hedera Account'
+                  <>
+                    <FaWallet />
+                    Generate Hedera Account
+                  </>
                 )}
               </button>
             </div>
           ) : (
             <div className="account-details">
               <div className="success-message">
-                <h3>✅ Account Created Successfully!</h3>
+                <h3>
+                  <FaCheckCircle className="success-icon" />
+                  Account Created Successfully!
+                </h3>
                 <p>Your Hedera account has been generated. Please save your private key securely.</p>
               </div>
 
@@ -112,7 +139,17 @@ const HederaAccountSetup = ({ user, onAccountCreated, onClose }) => {
                       className="copy-btn"
                       onClick={() => copyToClipboard(accountData.accountId, 'address')}
                     >
-                      {copied.address ? '✓ Copied' : 'Copy'}
+                      {copied.address ? (
+                        <>
+                          <FaCheckCircle />
+                          Copied
+                        </>
+                      ) : (
+                        <>
+                          <FaCopy />
+                          Copy
+                        </>
+                      )}
                     </button>
                   </div>
                 </div>
@@ -131,18 +168,41 @@ const HederaAccountSetup = ({ user, onAccountCreated, onClose }) => {
                         className="reveal-btn"
                         onClick={() => setShowPrivateKey(!showPrivateKey)}
                       >
-                        {showPrivateKey ? '👁️ Hide' : '👁️ Show'}
+                        {showPrivateKey ? (
+                          <>
+                            <FaEyeSlash />
+                            Hide
+                          </>
+                        ) : (
+                          <>
+                            <FaEye />
+                            Show
+                          </>
+                        )}
                       </button>
                     </div>
                     <button 
                       className="copy-btn"
                       onClick={() => copyToClipboard(accountData.privateKey, 'privateKey')}
                     >
-                      {copied.privateKey ? '✓ Copied' : 'Copy Private Key'}
+                      {copied.privateKey ? (
+                        <>
+                          <FaCheckCircle />
+                          Copied
+                        </>
+                      ) : (
+                        <>
+                          <FaCopy />
+                          Copy Private Key
+                        </>
+                      )}
                     </button>
                   </div>
                   <p className="private-key-warning">
-                    <strong>⚠️ CRITICAL:</strong> Copy and save this private key immediately. 
+                    <strong>
+                      <FaExclamationTriangle className="warning-icon" />
+                      CRITICAL:
+                    </strong> Copy and save this private key immediately. 
                     Long press to select all text. We cannot recover it if lost!
                   </p>
                 </div>
@@ -160,7 +220,17 @@ const HederaAccountSetup = ({ user, onAccountCreated, onClose }) => {
                       className="copy-btn"
                       onClick={() => copyToClipboard(accountData.publicKey, 'publicKey')}
                     >
-                      {copied.publicKey ? '✓ Copied' : 'Copy'}
+                      {copied.publicKey ? (
+                        <>
+                          <FaCheckCircle />
+                          Copied
+                        </>
+                      ) : (
+                        <>
+                          <FaCopy />
+                          Copy
+                        </>
+                      )}
                     </button>
                   </div>
                 </div>
@@ -178,15 +248,31 @@ const HederaAccountSetup = ({ user, onAccountCreated, onClose }) => {
                       className="copy-btn"
                       onClick={() => copyToClipboard(accountData.evmAddress, 'evmAddress')}
                     >
-                      {copied.evmAddress ? '✓ Copied' : 'Copy'}
+                      {copied.evmAddress ? (
+                        <>
+                          <FaCheckCircle />
+                          Copied
+                        </>
+                      ) : (
+                        <>
+                          <FaCopy />
+                          Copy
+                        </>
+                      )}
                     </button>
                   </div>
                 </div>
 
                 <div className="info-section">
-                  <label>Balance</label>
+                  <label>
+                    <FaCoins className="label-icon" />
+                    Balance
+                  </label>
                   <div className="balance-display">
-                    <span className="balance-amount">{accountData.balance} HBAR</span>
+                    <span className="balance-amount">
+                      <FaCoins className="balance-icon" />
+                      {accountData.balance} HBAR
+                    </span>
                     <span className="balance-note">Initial funding from testnet</span>
                   </div>
                 </div>
@@ -194,9 +280,11 @@ const HederaAccountSetup = ({ user, onAccountCreated, onClose }) => {
 
               <div className="setup-actions">
                 <button className="confirm-btn" onClick={handleConfirm}>
+                  <FaCheckCircle />
                   Confirm & Continue
                 </button>
                 <button className="regenerate-btn" onClick={() => setAccountData(null)}>
+                  <FaWallet />
                   Generate New Account
                 </button>
               </div>

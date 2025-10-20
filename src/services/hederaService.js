@@ -184,9 +184,9 @@ export class HederaService {
   /**
    * Mint additional fungible supply.
    */
-  async mintFungible({ tokenId, amount }) {
+  async mintFungible({ tokenId, amount, supplyPrivateKey }) {
     if (!this.client) this.initializeClient();
-    const supplyKey = PrivateKey.fromString(this.operatorKey);
+    const supplyKey = PrivateKey.fromString(supplyPrivateKey || this.operatorKey);
 
     const tx = await new TokenMintTransaction()
       .setTokenId(TokenId.fromString(tokenId))
@@ -268,11 +268,10 @@ export class HederaService {
    * Transfer fungible tokens or a single NFT serial from treasury to user.
    * For NFTs, provide serial number via tokenId like `0.0.x@serial` or use the nftSerial param.
    */
-  async transferToken({ tokenId, amount = 0, fromAccountId, toAccountId, nftSerial }) {
+  async transferToken({ tokenId, amount = 0, fromAccountId, fromPrivateKey, toAccountId, nftSerial }) {
     if (!this.client) this.initializeClient();
-
     const fromId = AccountId.fromString(fromAccountId || this.operatorId);
-    const fromKey = PrivateKey.fromString(this.operatorKey);
+    const fromKey = PrivateKey.fromString(fromPrivateKey || this.operatorKey);
     const toId = AccountId.fromString(toAccountId);
 
     let tx = new TransferTransaction();

@@ -4,6 +4,7 @@ import LoginScreen from "./LoginScreen";
 import HederaAccountSetup from "./HederaAccountSetup";
 import UserProfile from "./components/UserProfile";
 import { createUserProfile, createHederaAccount } from "./lib/supabase";
+import { FaSignOutAlt, FaUser, FaWallet } from 'react-icons/fa';
 
 export const AuthPage = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -66,12 +67,16 @@ export const AuthPage = () => {
   return (
     <div className="app">
       <div className="user-bar">
-        <span>Welcome, {user?.name || user?.email || "Player"}!</span>
+        <div className="user-welcome">
+          <FaUser className="user-icon" />
+          <span>Welcome, {user?.name || user?.email || "Player"}!</span>
+        </div>
         <div className="user-actions">
           <button
             onClick={() => setShowUserProfile(true)}
             className="profile-btn"
           >
+            <FaUser />
             Profile
           </button>
           {user?.authType === "email" && !user?.hederaAccount && (
@@ -79,10 +84,12 @@ export const AuthPage = () => {
               onClick={() => setShowHederaSetup(true)}
               className="hedera-setup-btn"
             >
+              <FaWallet />
               Create Hedera Account
             </button>
           )}
           <button onClick={handleLogout} className="logout-btn">
+            <FaSignOutAlt />
             Logout
           </button>
         </div>
@@ -94,7 +101,18 @@ export const AuthPage = () => {
             try {
               // Save Hedera account to Supabase
               const profileId = user.profileId;
-              await createHederaAccount(profileId, hederaAccount);
+              console.log('Saving Hedera account to database:', {
+                profileId,
+                hederaAccount: {
+                  accountId: hederaAccount.accountId,
+                  evmAddress: hederaAccount.evmAddress,
+                  balance: hederaAccount.balance,
+                  created: hederaAccount.created
+                }
+              });
+              
+              const savedAccount = await createHederaAccount(profileId, hederaAccount);
+              console.log('Successfully saved Hedera account:', savedAccount);
 
               const updatedUser = { ...user, hederaAccount };
               setUser(updatedUser);
@@ -105,8 +123,14 @@ export const AuthPage = () => {
               setShowHederaSetup(false);
             } catch (error) {
               console.error("Error saving Hedera account:", error);
+              console.error("Error details:", {
+                message: error.message,
+                code: error.code,
+                details: error.details,
+                hint: error.hint
+              });
               alert(
-                "Account created but failed to save to database. Please try again."
+                `Account created but failed to save to database: ${error.message}. Please try again.`
               );
             }
           }}

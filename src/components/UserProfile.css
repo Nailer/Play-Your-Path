@@ -32,6 +32,17 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-icon {
+  color: #4f46e5;
+  font-size: 1.5rem;
+}
+
 .profile-header h2 {
   color: #fff;
   margin: 0;
@@ -88,6 +99,12 @@
   margin-bottom: 20px;
 }
 
+.spinner-icon {
+  animation: spin 1s linear infinite;
+  font-size: 1.5rem;
+  color: #4f46e5;
+}
+
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
@@ -103,6 +120,13 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
+}
+
+.error-icon {
+  color: #ef4444;
+  font-size: 1.1rem;
+  flex-shrink: 0;
 }
 
 .error-message button {
@@ -128,6 +152,14 @@
   font-size: 1.3rem;
   margin: 0 0 20px 0;
   font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.section-icon {
+  color: #4f46e5;
+  font-size: 1.2rem;
 }
 
 .section-header {
@@ -147,6 +179,9 @@
   font-size: 0.9rem;
   font-weight: 500;
   transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .refresh-btn:hover:not(:disabled) {
@@ -178,6 +213,14 @@
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.label-icon {
+  color: #4f46e5;
+  font-size: 0.9rem;
 }
 
 .info-item span {
@@ -229,6 +272,15 @@
   font-size: 2rem;
   font-weight: 700;
   margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.balance-icon {
+  color: #4ade80;
+  font-size: 1.8rem;
 }
 
 .balance-label {

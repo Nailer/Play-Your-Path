@@ -1,5 +1,5 @@
 import { hederaService } from './hederaService';
-import { getDailyPoints, updateDailyPoints, upsertTokenBalance } from '../lib/supabase';
+import { getDailyPoints, updateDailyPoints, upsertTokenBalance, getHtsConfig, getUserHederaAccount } from '../lib/supabase';
 
 // Claim daily points (flower vase). Optionally mint fungible reward and update balances.
 export async function claimDailyReward({ userProfileId, hederaAccountId }) {
@@ -8,34 +8,84 @@ export async function claimDailyReward({ userProfileId, hederaAccountId }) {
   const todayStr = today.toISOString().slice(0, 10);
   const pointsRow = await getDailyPoints(userProfileId);
 
-  if (pointsRow.last_claimed_date === todayStr) {
-    return { ok: false, message: 'Already claimed today' };
-  }
+  // Unlimited claims for testing: skip one-claim-per-day restriction
 
   // Add points
   const newPoints = Number(pointsRow.points || 0) + 10; // base daily 10
   const updated = await updateDailyPoints(userProfileId, { points: newPoints, last_claimed_date: todayStr });
 
-  // Optional: also grant fungible tokens if reward token configured
-  if (hederaService.rewardTokenId && hederaAccountId) {
+  // Optional: also grant fungible tokens via HTS if configured in Supabase
+  const hts = await getHtsConfig();
+  if (hts && hts.reward_token_id && hts.treasury_account_id && hederaAccountId) {
     try {
-      // Ensure association was done elsewhere
-      await hederaService.transferToken({
-        tokenId: hederaService.rewardTokenId,
-        amount: 1000, // eg. 0.00001000 if 8 decimals
-        toAccountId: hederaAccountId
-      });
+      const amount = Number(hts.daily_amount || 1000);
+      const canMint = Boolean(hts.use_supply_on_claim && hts.supply_private_key);
+      const canTransfer = Boolean(hts.treasury_private_key);
 
-      // Update local balance cache
-      await upsertTokenBalance({
-        userId: userProfileId,
-        tokenId: hederaService.rewardTokenId,
-        tokenSymbol: 'PYPR',
-        balance: Number((updated.points || newPoints)) // demo linkage
-      });
+      // Best-effort auto-associate on first claim using stored user key (dev/hackathon convenience)
+      try {
+        const userHedera = await getUserHederaAccount(userProfileId);
+        if (userHedera?.account_id && userHedera?.private_key) {
+          await hederaService.associateToken({
+            accountId: userHedera.account_id,
+            accountPrivateKey: userHedera.private_key,
+            tokenId: hts.reward_token_id
+          });
+        }
+      } catch (e) {
+        // ignore if already associated or fails; transfer may still succeed
+        console.warn('Auto-association skipped/failed', e?.message || e);
+      }
+
+      if (canMint) {
+        await hederaService.mintFungible({ tokenId: hts.reward_token_id, amount, supplyPrivateKey: hts.supply_private_key });
+      }
+
+      if (canTransfer) {
+        try {
+          await hederaService.transferToken({
+            tokenId: hts.reward_token_id,
+            amount,
+            fromAccountId: hts.treasury_account_id,
+            fromPrivateKey: hts.treasury_private_key,
+            toAccountId: hederaAccountId
+          });
+        } catch (err) {
+          const msg = String(err?.message || err || '');
+          const insufficient = msg.includes('INSUFFICIENT_TOKEN_BALANCE');
+          if (insufficient && hts.supply_private_key) {
+            // Mint, then retry once
+            try {
+              await hederaService.mintFungible({ tokenId: hts.reward_token_id, amount, supplyPrivateKey: hts.supply_private_key });
+              await hederaService.transferToken({
+                tokenId: hts.reward_token_id,
+                amount,
+                fromAccountId: hts.treasury_account_id,
+                fromPrivateKey: hts.treasury_private_key,
+                toAccountId: hederaAccountId
+              });
+            } catch (e2) {
+              console.warn('Retry transfer after mint failed', e2);
+              throw err; // propagate original
+            }
+          } else {
+            throw err;
+          }
+        }
+
+        // Update local balance cache
+        await upsertTokenBalance({
+          userId: userProfileId,
+          tokenId: hts.reward_token_id,
+          tokenSymbol: hts.token_symbol || 'PLANT',
+          balance: Number(newPoints)
+        });
+      } else {
+        console.warn('HTS transfer skipped: missing treasury_private_key in hts_config');
+      }
     } catch (e) {
-      // Non-fatal
-      console.warn('Token reward transfer failed', e);
+      // Non-fatal to the points award path
+      console.warn('Token reward mint/transfer failed', e);
     }
   }
 

@@ -72,6 +72,23 @@ var game = {
 			$('#the_game').find('#note').tooltip('right');
 			$('#water, #picture').tooltip('right');
 			
+			// Daily claim functionality for plant
+			$('#plant_check').click(function() {
+				// Check if user is logged in
+				var auth = localStorage.getItem('pyp-auth');
+				if (!auth) {
+					$('#player').text_cloud('Please login first to claim daily rewards!', 3000);
+					return;
+				}
+				
+				// Send claim request to parent
+				window.parent.postMessage({
+					type: 'PYP_DAILY_CLAIM'
+				}, '*');
+				
+				$('#player').text_cloud('Claiming daily rewards...', 2000);
+			});
+			
 			//bubbles!
 			$('#bubbles').sprite({
 				fps: 8,

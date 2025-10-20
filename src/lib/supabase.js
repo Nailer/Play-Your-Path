@@ -60,7 +60,13 @@ export const updateUserProfile = async (userId, updates) => {
 export const upsertTokenBalance = async ({ userId, tokenId, tokenSymbol, balance }) => {
   const { data, error } = await supabase
     .from('user_token_balances')
-    .upsert({ user_id: userId, token_id: tokenId, token_symbol: tokenSymbol, balance })
+    .upsert(
+      { user_id: userId, token_id: tokenId, token_symbol: tokenSymbol, balance },
+      { 
+        onConflict: 'user_id,token_id',
+        ignoreDuplicates: false
+      }
+    )
     .select()
     .single();
   if (error) throw error;
@@ -83,7 +89,7 @@ export const getDailyPoints = async (userId) => {
     .select('*')
     .eq('user_id', userId)
     .single();
-  if (error && error.code !== 'PGRST116') throw error;
+  if (error && error.code !== 'PGRST116' && error.status !== 406) throw error;
   return data || { user_id: userId, points: 0, last_claimed_date: null };
 };
 
@@ -228,6 +234,16 @@ export const completeQuest = async ({ userId, questCode }) => {
   return { ...data, reward_points: quest.reward_points };
 };
 export const createHederaAccount = async (userProfileId, hederaData) => {
+  console.log('Attempting to create Hedera account with data:', {
+    userProfileId,
+    hederaData: {
+      accountId: hederaData.accountId,
+      evmAddress: hederaData.evmAddress,
+      balance: hederaData.balance,
+      created: hederaData.created
+    }
+  });
+
   const { data, error } = await supabase
     .from('hedera_accounts')
     .insert([{
@@ -242,7 +258,19 @@ export const createHederaAccount = async (userProfileId, hederaData) => {
     .select()
     .single();
 
-  if (error) throw error;
+  if (error) {
+    console.error('Supabase error details:', {
+      message: error.message,
+      code: error.code,
+      details: error.details,
+      hint: error.hint,
+      status: error.status,
+      statusText: error.statusText
+    });
+    throw error;
+  }
+  
+  console.log('Successfully created Hedera account:', data);
   return data;
 };
 
@@ -269,6 +297,48 @@ export const getUserHederaAccount = async (userId) => {
     .single();
 
   if (error && error.code !== 'PGRST116') throw error; // PGRST116 = no rows found
+  return data;
+};
+
+// =====================
+// HTS Treasury & Token Config
+// =====================
+export const getHtsConfig = async () => {
+  const { data, error } = await supabase
+    .from('hts_config')
+    .select('*')
+    .limit(1)
+    .single();
+  if (error && error.code !== 'PGRST116') throw error;
+  return data || null;
+};
+
+export const upsertHtsConfig = async ({
+  reward_token_id,
+  token_symbol,
+  decimals,
+  daily_amount,
+  use_supply_on_claim,
+  treasury_account_id,
+  treasury_private_key,
+  supply_private_key
+}) => {
+  const { data, error } = await supabase
+    .from('hts_config')
+    .upsert({
+      id: 1,
+      reward_token_id,
+      token_symbol,
+      decimals,
+      daily_amount,
+      use_supply_on_claim,
+      treasury_account_id,
+      treasury_private_key,
+      supply_private_key
+    })
+    .select()
+    .single();
+  if (error) throw error;
   return data;
 };
 
