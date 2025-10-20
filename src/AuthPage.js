@@ -5,6 +5,7 @@ import HederaAccountSetup from "./HederaAccountSetup";
 import UserProfile from "./components/UserProfile";
 import { createUserProfile, createHederaAccount } from "./lib/supabase";
 import { initHashConnect } from "./utils/hashconnect";
+import { useNavigate } from "react-router-dom";
 import CreateTokenForm from "./components/CreateTokenForm";
 
 export const AuthPage = () => {
@@ -13,6 +14,7 @@ export const AuthPage = () => {
   const [showHederaSetup, setShowHederaSetup] = useState(false);
   const [showUserProfile, setShowUserProfile] = useState(false);
   const [accountId, setAccountId] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Check for existing auth state
@@ -27,6 +29,7 @@ export const AuthPage = () => {
       }
     }
   }, []);
+  
 
   ////////////////////////////// hashconnect useEffect /////////////////////////////
   useEffect(() => {
@@ -140,14 +143,14 @@ export const AuthPage = () => {
         <UserProfile user={user} onClose={() => setShowUserProfile(false)} />
       )}
 
-      <div>
+      {/* <div>
         <h1>🚀 Hedera Token Creator</h1>
         {accountId ? (
           <CreateTokenForm />
         ) : (
           <p>Please connect your HashPack wallet to continue.</p>
         )}
-      </div>
+      </div> */}
     </div>
   );
 };
