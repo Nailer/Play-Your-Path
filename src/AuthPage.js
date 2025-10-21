@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
-import LoginScreen from "./LoginScreen";
-import HederaAccountSetup from "./HederaAccountSetup";
-import UserProfile from "./components/UserProfile";
-import { createUserProfile, createHederaAccount } from "./lib/supabase";
-import { initHashConnect } from "./utils/hashconnect";
+import LoginScreen from "./LoginScreen.js";
+import HederaAccountSetup from "./HederaAccountSetup.js";
+import UserProfile from "./components/UserProfile.js";
+import { createUserProfile, createHederaAccount } from "./lib/supabase.js";
+import { initHashConnect } from "./utils/hashconnect.js";
 import { useNavigate } from "react-router-dom";
-import CreateTokenForm from "./components/CreateTokenForm";
+// import CreateTokenForm from "./components/CreateTokenForm";
 
 export const AuthPage = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -29,7 +29,12 @@ export const AuthPage = () => {
       }
     }
   }, []);
-  
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/", { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   ////////////////////////////// hashconnect useEffect /////////////////////////////
   useEffect(() => {

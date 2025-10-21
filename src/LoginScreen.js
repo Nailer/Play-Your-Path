@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './LoginScreen.css';
-import { AuthService } from './services/authService';
+import { AuthService } from './services/authService.js';
 
 const LoginScreen = ({ onLogin }) => {
   const [isSignUp, setIsSignUp] = useState(false);

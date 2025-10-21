@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './HederaAccountSetup.css';
-import { createHederaAccount } from './services/hederaService';
+import { createHederaAccount } from './services/hederaService.js';
 
 const HederaAccountSetup = ({ user, onAccountCreated, onClose }) => {
   const [isGenerating, setIsGenerating] = useState(false);

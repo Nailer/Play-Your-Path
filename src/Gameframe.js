@@ -1,7 +1,7 @@
 
 import React from "react";
 import './App.css';
-import { AuthPage } from "./AuthPage";
+import { AuthPage } from "./AuthPage.js";
 
 export default function GameFrame() {
   return (
