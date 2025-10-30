@@ -173,16 +173,20 @@ window.PYP.completeQuest = function(questCode){
 			return b;
 		}
 
-		var learnBtn = mkBtn('Learn', function(){ window.postMessage({type:'PYP_MODE', mode:'learn'}, '*'); }, '#2196F3');
-		var playBtn = mkBtn('Play', function(){ window.postMessage({type:'PYP_MODE', mode:'play'}, '*'); }, '#FF9800');
-		var tradeBtn = mkBtn('Trade', function(){ window.postMessage({type:'PYP_MODE', mode:'trade'}, '*'); }, '#9C27B0');
-		var governBtn = mkBtn('Govern', function(){ window.postMessage({type:'PYP_MODE', mode:'govern'}, '*'); }, '#F44336');
+		var learnBtn = mkBtn('Learn', function(){ window.parent.postMessage({type:'PYP_MODE', mode:'learn'}, '*'); }, '#2196F3');
+		var playBtn = mkBtn('Play', function(){ window.parent.postMessage({type:'PYP_MODE', mode:'play'}, '*'); }, '#FF9800');
+		var tradeBtn = mkBtn('Trade', function(){ window.parent.postMessage({type:'PYP_MODE', mode:'trade'}, '*'); }, '#9C27B0');
+		var governBtn = mkBtn('Govern', function(){ window.parent.postMessage({type:'PYP_MODE', mode:'govern'}, '*'); }, '#F44336');
 		var teleportBtn = mkBtn('Teleport', function(){ window.location.href = 'village.html'; }, '#607D8B');
-		var associateBtn = mkBtn('Associate Token', function(){ window.postMessage({type:'PYP_ASSOCIATE'}, '*'); }, '#10B981');
-		var summonBtn = mkBtn('Summon', function(){ window.postMessage({type:'PYP_SUMMON', action:'create'}, '*'); }, '#4CAF50');
+		var associateBtn = mkBtn('Associate Token', function(){ window.parent.postMessage({type:'PYP_ASSOCIATE'}, '*'); }, '#10B981');
+		var talismanBtn = mkBtn('Talismans', function(){ 
+			console.log('Talisman button clicked, sending message');
+			window.parent.postMessage({type:'PYP_TALISMAN_COLLECTION'}, '*'); 
+		}, '#8B5CF6');
+		var summonBtn = mkBtn('Summon', function(){ window.parent.postMessage({type:'PYP_SUMMON', action:'create'}, '*'); }, '#4CAF50');
 		var joinBtn = mkBtn('Join', function(){ 
 			var code = prompt('Enter invite code:');
-			if (code) window.postMessage({type:'PYP_SUMMON', action:'join', code: code}, '*'); 
+			if (code) window.parent.postMessage({type:'PYP_SUMMON', action:'join', code: code}, '*'); 
 		}, '#FF5722');
 		
 		// No visible demo toggle in UI
@@ -193,6 +197,7 @@ window.PYP.completeQuest = function(questCode){
 		pypOverlay.appendChild(governBtn);
 		pypOverlay.appendChild(teleportBtn);
 		pypOverlay.appendChild(associateBtn);
+		pypOverlay.appendChild(talismanBtn);
 		pypOverlay.appendChild(summonBtn);
 		pypOverlay.appendChild(joinBtn);
 		// demo button removed to keep demo mode unobtrusive
@@ -376,8 +381,9 @@ window.PYP.completeQuest = function(questCode){
 					<div id="pyp-success-animation" style="display: none; margin: 20px 0;">
 						<div style="font-size: 48px; margin-bottom: 12px; animation: bounce 0.6s ease;">🎉</div>
 						<div style="font-size: 18px; font-weight: 700; color: #22c55e; margin-bottom: 8px;">Reward Claimed!</div>
-						<div id="pyp-daily-points" style="font-size:36px; line-height:1; margin: 8px 0; font-weight:800; background: linear-gradient(90deg,#22c55e,#84cc16,#fbbf24); -webkit-background-clip:text; -webkit-text-fill-color:transparent; animation: glow 2s ease-in-out infinite alternate;">+10</div>
-						<div style="font-size: 12px; opacity: 0.7;">Plant tokens minted to your wallet!</div>
+					<div id="pyp-daily-points" style="font-size:36px; line-height:1; margin: 8px 0; font-weight:800; background: linear-gradient(90deg,#22c55e,#84cc16,#fbbf24); -webkit-background-clip:text; -webkit-text-fill-color:transparent; animation: glow 2s ease-in-out infinite alternate;">+10</div>
+					<div id="pyp-bonus-message" style="font-size: 12px; opacity: 0.7; color: #22c55e; font-weight: 600; margin-top: 4px;"></div>
+					<div style="font-size: 12px; opacity: 0.7;">Plant tokens minted to your wallet!</div>
 					</div>
 					
 					<!-- Error State -->
@@ -465,13 +471,15 @@ window.PYP.completeQuest = function(questCode){
 				}, 800);
 			}
 
-			function showSuccess(points) {
+			function showSuccess(points, bonusMessage) {
 				document.getElementById('pyp-minting-progress').style.display = 'none';
 				document.getElementById('pyp-success-animation').style.display = 'block';
 				document.getElementById('pyp-error-state').style.display = 'none';
 				
 				var pointsEl = document.getElementById('pyp-daily-points');
+				var bonusEl = document.getElementById('pyp-bonus-message');
 				pointsEl.textContent = `+${points}`;
+				bonusEl.textContent = bonusMessage || '';
 				
 				// Add confetti effect
 				for (let i = 0; i < 20; i++) {
@@ -499,7 +507,7 @@ window.PYP.completeQuest = function(questCode){
 				document.getElementById('pyp-error-msg').textContent = message;
 			}
 
-			function openModal(message, ok, points){
+			function openModal(message, ok, points, bonusMessage){
 				var msg = document.getElementById('pyp-daily-msg');
 				msg.textContent = message || 'Click the plant to claim your daily reward!';
 				
@@ -511,7 +519,7 @@ window.PYP.completeQuest = function(questCode){
 				
 				if (ok && typeof points === 'number') {
 					showMintingProgress();
-					setTimeout(() => showSuccess(points), 3000);
+					setTimeout(() => showSuccess(points, bonusMessage), 3000);
 				} else if (ok === false) {
 					showError(message || 'Unable to claim reward');
 				}
@@ -533,7 +541,7 @@ window.PYP.completeQuest = function(questCode){
 			window.addEventListener('message', function(ev){
 				if (!ev.data || typeof ev.data !== 'object') return;
 				if (ev.data.type === 'PYP_DAILY_RESULT') {
-					openModal(ev.data.message, !!ev.data.ok, ev.data.points);
+					openModal(ev.data.message, !!ev.data.ok, ev.data.points, ev.data.bonusMessage);
 				}
 			});
 		})();

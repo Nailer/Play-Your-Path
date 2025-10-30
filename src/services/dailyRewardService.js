@@ -1,5 +1,6 @@
 import { hederaService } from './hederaService';
 import { getDailyPoints, updateDailyPoints, upsertTokenBalance, getHtsConfig, getUserHederaAccount } from '../lib/supabase';
+import TalismanService from './talismanService';
 
 // Claim daily points (flower vase). Optionally mint fungible reward and update balances.
 export async function claimDailyReward({ userProfileId, hederaAccountId }) {
@@ -10,17 +11,31 @@ export async function claimDailyReward({ userProfileId, hederaAccountId }) {
 
   // Unlimited claims for testing: skip one-claim-per-day restriction
 
-  // Add points
-  const newPoints = Number(pointsRow.points || 0) + 10; // base daily 10
+  // Add points with talisman bonus
+  const basePoints = 10;
+  const talismanBonus = await TalismanService.applyDailyPlanterPerk(userProfileId, basePoints);
+  const newPoints = Number(pointsRow.points || 0) + talismanBonus.points;
   const updated = await updateDailyPoints(userProfileId, { points: newPoints, last_claimed_date: todayStr });
 
   // Optional: also grant fungible tokens via HTS if configured in Supabase
   const hts = await getHtsConfig();
+  console.log('HTS Config:', hts);
+  console.log('Hedera Account ID:', hederaAccountId);
+  
   if (hts && hts.reward_token_id && hts.treasury_account_id && hederaAccountId) {
     try {
       const amount = Number(hts.daily_amount || 1000);
       const canMint = Boolean(hts.use_supply_on_claim && hts.supply_private_key);
       const canTransfer = Boolean(hts.treasury_private_key);
+      
+      console.log('Token minting/transfer config:', {
+        amount,
+        canMint,
+        canTransfer,
+        use_supply_on_claim: hts.use_supply_on_claim,
+        has_supply_key: !!hts.supply_private_key,
+        has_treasury_key: !!hts.treasury_private_key
+      });
 
       // Best-effort auto-associate on first claim using stored user key (dev/hackathon convenience)
       try {
@@ -89,7 +104,13 @@ export async function claimDailyReward({ userProfileId, hederaAccountId }) {
     }
   }
 
-  return { ok: true, points: newPoints };
+  return { 
+    ok: true, 
+    points: newPoints,
+    basePoints: basePoints,
+    bonus: talismanBonus.bonus,
+    bonusMessage: talismanBonus.message
+  };
 }
 
 

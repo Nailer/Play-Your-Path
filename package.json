@@ -21,7 +21,10 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "create:plant": "node scripts/create-plant-token.js 'Plant Token' PLANT 8 0"
+    "create:plant": "node scripts/create-plant-token.js 'Plant Token' PLANT 8 0",
+    "deploy:talismans": "node scripts/deploy-talisman-nfts.js",
+    "mint:talisman": "node scripts/mint-talisman.js",
+    "award:talisman": "node scripts/award-talisman.js"
   },
   "eslintConfig": {
     "extends": [
@@ -43,6 +46,9 @@
   },
   "devDependencies": {
     "ajv": "^6.12.6",
-    "ajv-keywords": "^3.5.2"
+    "ajv-keywords": "^3.5.2",
+    "axios": "^1.12.2",
+    "dotenv": "^16.6.1",
+    "form-data": "^4.0.4"
   }
 }

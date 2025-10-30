@@ -1,12 +1,15 @@
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import './App.css';
 import { createSummon, getSummonByCode, acceptSummon, assignQuest, completeQuest, getUserHederaAccount, getHtsConfig } from './lib/supabase';
 import { claimDailyReward } from './services/dailyRewardService';
 import { hederaService } from './services/hederaService';
+import TalismanCollection from './components/TalismanCollection';
 
 export default function GameFrame() {
   const iframeRef = useRef(null);
+  const [showTalismanCollection, setShowTalismanCollection] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState(null);
 
   useEffect(() => {
     const handleMessage = async (event) => {
@@ -143,6 +146,10 @@ export default function GameFrame() {
           case 'PYP_DAILY_CLAIM':
             try {
               const auth = JSON.parse(localStorage.getItem('pyp-auth') || '{}');
+              console.log('Auth object:', auth);
+              console.log('User object:', auth.user);
+              console.log('Hedera account:', auth.user?.hederaAccount);
+              
               if (!auth.user?.profileId) {
                 // Demo mode: fake daily claim
                 if (iframeRef.current?.contentWindow?.PYP?.demoMode) {
@@ -159,9 +166,18 @@ export default function GameFrame() {
                 return;
               }
               
+              // Get Hedera account ID from auth or fetch from database
+              let hederaAccountId = auth.user.hederaAccount?.accountId;
+              if (!hederaAccountId) {
+                console.log('Hedera account not in auth, fetching from database...');
+                const hederaAccount = await getUserHederaAccount(auth.user.profileId);
+                hederaAccountId = hederaAccount?.account_id;
+                console.log('Fetched Hedera account:', hederaAccount);
+              }
+              
               const result = await claimDailyReward({ 
                 userProfileId: auth.user.profileId,
-                hederaAccountId: auth.user.hederaAccount?.accountId 
+                hederaAccountId: hederaAccountId
               });
               
               if (result.ok) {
@@ -170,7 +186,10 @@ export default function GameFrame() {
                   type: 'PYP_DAILY_RESULT',
                   ok: true,
                   points: result.points,
-                  message: `Daily reward claimed! +${result.points} points`
+                  basePoints: result.basePoints,
+                  bonus: result.bonus,
+                  bonusMessage: result.bonusMessage,
+                  message: `Daily reward claimed! +${result.points} points${result.bonusMessage ? ` (${result.bonusMessage})` : ''}`
                 }, '*');
               } else {
                 iframeRef.current?.contentWindow?.postMessage({
@@ -224,6 +243,24 @@ export default function GameFrame() {
               }
             }
             break;
+            
+          case 'PYP_TALISMAN_COLLECTION':
+            try {
+              console.log('Talisman collection button clicked');
+              const auth = JSON.parse(localStorage.getItem('pyp-auth') || '{}');
+              console.log('Auth data:', auth);
+              if (!auth.user?.profileId) {
+                alert('Please login first');
+                return;
+              }
+              console.log('Setting talisman collection to open for user:', auth.user.profileId);
+              setCurrentUserId(auth.user.profileId);
+              setShowTalismanCollection(true);
+            } catch (error) {
+              console.error('Error opening talisman collection:', error);
+              alert(`Error: ${error.message}`);
+            }
+            break;
         }
       } catch (error) {
         console.error('Error handling message:', error);
@@ -234,6 +271,8 @@ export default function GameFrame() {
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
   }, []);
+
+  console.log('GameFrame render:', { showTalismanCollection, currentUserId });
 
   return (
     <div className="">
@@ -254,6 +293,15 @@ export default function GameFrame() {
           padding: "0",
           margin: "0"
         }}
+      />
+      
+      <TalismanCollection
+        isOpen={showTalismanCollection}
+        onClose={() => {
+          console.log('Closing talisman collection');
+          setShowTalismanCollection(false);
+        }}
+        userId={currentUserId}
       />
     </div>
   );

@@ -301,6 +301,160 @@ export const getUserHederaAccount = async (userId) => {
 };
 
 // =====================
+// Talisman System
+// =====================
+export const getTalismanCollections = async () => {
+  const { data, error } = await supabase
+    .from('talisman_collections')
+    .select('*')
+    .order('rarity', { ascending: false });
+  if (error) throw error;
+  return data || [];
+};
+
+export const getUserTalismans = async (userId) => {
+  const { data, error } = await supabase
+    .from('user_talismans')
+    .select(`
+      *,
+      talisman_collections (
+        name,
+        description,
+        emoji,
+        perk_type,
+        perk_config,
+        rarity
+      )
+    `)
+    .eq('user_id', userId)
+    .order('minted_at', { ascending: false });
+  if (error) throw error;
+  return data || [];
+};
+
+export const getActiveTalisman = async (userId) => {
+  const { data, error } = await supabase
+    .from('user_talismans')
+    .select(`
+      *,
+      talisman_collections (
+        name,
+        description,
+        emoji,
+        perk_type,
+        perk_config,
+        rarity
+      )
+    `)
+    .eq('user_id', userId)
+    .eq('is_active', true)
+    .single();
+  if (error && error.code !== 'PGRST116') throw error;
+  return data || null;
+};
+
+export const mintTalisman = async ({ userId, collectionId, nftSerialNumber }) => {
+  const { data, error } = await supabase
+    .from('user_talismans')
+    .insert({
+      user_id: userId,
+      collection_id: collectionId,
+      nft_serial_number: nftSerialNumber
+    })
+    .select(`
+      *,
+      talisman_collections (
+        name,
+        description,
+        emoji,
+        perk_type,
+        perk_config,
+        rarity
+      )
+    `)
+    .single();
+  if (error) throw error;
+  return data;
+};
+
+export const activateTalisman = async ({ userId, talismanId }) => {
+  // First deactivate all other talismans for this user
+  await supabase
+    .from('user_talismans')
+    .update({ is_active: false })
+    .eq('user_id', userId);
+
+  // Then activate the selected talisman
+  const { data, error } = await supabase
+    .from('user_talismans')
+    .update({ 
+      is_active: true,
+      activated_at: new Date().toISOString()
+    })
+    .eq('id', talismanId)
+    .eq('user_id', userId)
+    .select(`
+      *,
+      talisman_collections (
+        name,
+        description,
+        emoji,
+        perk_type,
+        perk_config,
+        rarity
+      )
+    `)
+    .single();
+  if (error) throw error;
+
+  // Log activation
+  await supabase
+    .from('talisman_activations')
+    .insert({
+      user_id: userId,
+      talisman_id: talismanId
+    });
+
+  return data;
+};
+
+export const deactivateTalisman = async ({ userId, talismanId }) => {
+  const { data, error } = await supabase
+    .from('user_talismans')
+    .update({ is_active: false })
+    .eq('id', talismanId)
+    .eq('user_id', userId)
+    .select()
+    .single();
+  if (error) throw error;
+
+  // Log deactivation
+  await supabase
+    .from('talisman_activations')
+    .update({ deactivated_at: new Date().toISOString() })
+    .eq('user_id', userId)
+    .eq('talisman_id', talismanId)
+    .is('deactivated_at', null);
+
+  return data;
+};
+
+export const logTalismanPerkUsage = async ({ userId, talismanId, perkType, usageData = {} }) => {
+  const { data, error } = await supabase
+    .from('talisman_perk_usage')
+    .insert({
+      user_id: userId,
+      talisman_id: talismanId,
+      perk_type: perkType,
+      usage_data: usageData
+    })
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+};
+
+// =====================
 // HTS Treasury & Token Config
 // =====================
 export const getHtsConfig = async () => {
