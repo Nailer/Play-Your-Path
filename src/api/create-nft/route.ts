@@ -1,4 +1,4 @@
-import { createNftAndMint } from '@/lib/hedera';
+import { createNftAndMint } from '../../lib/nftService';
 
 export async function POST(request: Request) {
   try {

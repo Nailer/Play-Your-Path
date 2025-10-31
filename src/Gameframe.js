@@ -6,7 +6,7 @@ import { AuthPage } from "./AuthPage.js";
 export default function GameFrame() {
   return (
     <>
-      <AuthPage />
+      {/* <AuthPage /> */}
       <div className="">
         <iframe
           src={process.env.PUBLIC_URL + '/game/index.html'}

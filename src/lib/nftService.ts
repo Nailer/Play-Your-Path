@@ -13,7 +13,7 @@ export interface CreateNftResult {
 }
 
 
-export async function createNftAndMint(input: CreateNftInput): Promise<CreateNftResult> {
+async function createNftAndMint(input: CreateNftInput): Promise<CreateNftResult> {
   const operatorId = process.env.MY_ACCOUNT_ID || process.env.NEXT_PUBLIC_MY_ACCOUNT_ID;
   const operatorKey = process.env.MY_PRIVATE_KEY || process.env.NEXT_PUBLIC_MY_PRIVATE_KEY;
   if (!operatorId || !operatorKey) throw new Error('Missing Hedera operator credentials');
@@ -53,3 +53,18 @@ export async function createNftAndMint(input: CreateNftInput): Promise<CreateNft
   client.close();
   return { tokenId: tokenId.toString(), mintedSerials: serials };
 }
+
+// example usage: provide a valid CreateNftInput and handle the result
+const exampleInput: CreateNftInput = {
+  tokenName: 'MyNFT',
+  tokenSymbol: 'MNFT',
+  maxSupply: 5,
+  metadataCids: [
+    'ipfs://bafybeib7examplecid1/metadata.json',
+    'ipfs://bafybeib7examplecid2/metadata.json'
+  ],
+};
+
+createNftAndMint(exampleInput)
+  .then((res) => console.log('Created NFT:', res))
+  .catch((err) => console.error('Failed to create NFT:', err));

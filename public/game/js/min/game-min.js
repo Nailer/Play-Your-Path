@@ -785,7 +785,7 @@ var game = {
             target: "18-6",
             action: function () {
               sound_door.play();
-              game.room(5, 0);
+              game.boiler_room(5, 0);
             },
           });
         });
@@ -1287,6 +1287,7 @@ var game = {
       player_position_x: a,
       player_position_y: b,
       volume: 50,
+      // this is the function that handles the onclick function of the kitchen
       execute: function () {
         room.transparency(
           $("#cupboard, #cupboard_mask"),
@@ -1332,7 +1333,7 @@ var game = {
             },
           });
         });
-        $("#kitchen_use_1, #kitchen_use_2, #kitchen_use_3").click(function () {
+        $("#kitchen_use_3").click(function () {
           $("#kitchen_kitchen_true").css("opacity", ".3");
           var a = $("#kitchen");
           a.css("rotate", "1");

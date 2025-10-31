@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
 import './App.css';
 import GameFrame from './Gameframe.js';
 import { AuthPage } from './AuthPage.js';
-import NftTest from './services/NftTest.js';
+import CreateNFTForm from './CreateNFTForm.js';
 
 
 function App() {
@@ -13,7 +13,7 @@ function App() {
       
       <Routes>
         <Route path="/" element={<GameFrame />} />
-        <Route path="/nft" element={<NftTest />} />
+        <Route path="/nft" element={<CreateNFTForm />} />
         <Route path="/connect-wallet" element={<AuthPage />} />
       </Routes>
     </BrowserRouter>
