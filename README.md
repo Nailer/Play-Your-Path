@@ -8,6 +8,8 @@ PYP is more than a game — it's a proof-of-game platform, tracking user activit
 ## HASHGRAPH HACKATHON SUBMISSION CERTIFICATE
 <a href="https://drive.google.com/file/d/1sOhaOhmrroKDrVZCI5MKa9dxdYDkEekH/view?usp=sharing">View Certificate</a>
 
+<iframe width="560" height="315" src="https://www.youtube.com/embed/Cy6GhUrWrr8?si=vGbaE3XzrYaCVvwD" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
 ## Demo Video
 <a href="https://youtu.be/TLMQPFt7dDs">View Demo Video</a>
 
