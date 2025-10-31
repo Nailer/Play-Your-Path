@@ -3,11 +3,13 @@ import { BrowserRouter } from 'react-router-dom'
 import './App.css';
 import GameFrame from './Gameframe.js';
 import { AuthPage } from './AuthPage.js';
+import UserProfile from './components/UserProfile.js';
 import { FaSignOutAlt, FaUser } from 'react-icons/fa';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
+  const [showUserProfile, setShowUserProfile] = useState(false);
 
   useEffect(() => {
     // Check for existing auth state
@@ -47,6 +49,14 @@ function App() {
               <span>Welcome, {user?.name || user?.email || "Player"}!</span>
             </div>
             <div className="user-actions">
+              <button 
+                onClick={() => setShowUserProfile(true)} 
+                className="profile-btn"
+                title="View Profile"
+              >
+                <FaUser />
+                Profile
+              </button>
               <button onClick={handleLogout} className="logout-btn">
                 <FaSignOutAlt />
                 Logout
@@ -54,6 +64,13 @@ function App() {
             </div>
           </div>
           <GameFrame />
+          
+          {showUserProfile && (
+            <UserProfile 
+              user={user} 
+              onClose={() => setShowUserProfile(false)} 
+            />
+          )}
         </div>
       )}
     </BrowserRouter>

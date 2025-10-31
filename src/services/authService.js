@@ -67,9 +67,9 @@ export class AuthService {
         throw new Error('Failed to initialize HashConnect. Please ensure HashPack extension is installed.');
       }
 
-      // Check if already paired
-      if (hashconnect.pairingData && hashconnect.pairingData.accountIds && hashconnect.pairingData.accountIds.length > 0) {
-        const accountId = hashconnect.pairingData.accountIds[0];
+      // Check if already connected (HashConnect v3 uses connectedAccountIds)
+      if (hashconnect.connectedAccountIds && hashconnect.connectedAccountIds.length > 0) {
+        const accountId = hashconnect.connectedAccountIds[0].toString();
         const userId = `hashpack_${accountId}`;
         
         const userData = {
@@ -88,7 +88,7 @@ export class AuthService {
       return new Promise((resolve, reject) => {
         let resolved = false;
         
-        // Set up a one-time listener for pairing
+        // Set up a one-time listener for pairing (HashConnect v3)
         const pairingHandler = (pairingData) => {
           if (resolved) return;
           
@@ -96,7 +96,7 @@ export class AuthService {
             resolved = true;
             hashconnect.pairingEvent.off(pairingHandler); // Remove listener
             
-            const accountId = pairingData.accountIds[0];
+            const accountId = pairingData.accountIds[0]; // Already a string in SessionData
             const userId = `hashpack_${accountId}`;
             
             const userData = {
@@ -115,25 +115,12 @@ export class AuthService {
         // Listen for pairing events
         hashconnect.pairingEvent.on(pairingHandler);
 
-        // Try to connect - HashConnect v3 will open modal automatically
-        try {
-          // For HashConnect v3, try connectToLocalWallet first if available
-          if (typeof hashconnect.connectToLocalWallet === 'function') {
-            hashconnect.connectToLocalWallet();
-          } else if (typeof hashconnect.openPairingModal === 'function') {
-            hashconnect.openPairingModal();
-          } else {
-            // Fallback: try connect() method
-            hashconnect.connect().catch(err => {
-              console.error('HashConnect connect error:', err);
-            });
-          }
-        } catch (err) {
-          console.error('Error initiating connection:', err);
+        // Open pairing modal (HashConnect v3)
+        hashconnect.openPairingModal().catch((err) => {
+          console.error('Error opening pairing modal:', err);
           hashconnect.pairingEvent.off(pairingHandler);
-          reject(new Error('Failed to initiate wallet connection. Please try again.'));
-          return;
-        }
+          reject(new Error('Failed to open wallet connection. Please ensure HashPack extension is installed.'));
+        });
 
         // Set timeout to avoid hanging forever
         setTimeout(() => {
