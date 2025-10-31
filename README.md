@@ -5,6 +5,9 @@ Players play to progress as they learn about Hedera and earn points
 
 PYP is more than a game — it's a proof-of-game platform, tracking user activities, rewarding progress with NFTs & tokens, and building a blockchain reputation.
 
+## HASHGRAPH HACKATHON SUBMISSION CERTIFICATE
+<a href="https://drive.google.com/file/d/1sOhaOhmrroKDrVZCI5MKa9dxdYDkEekH/view?usp=sharing"></a>
+
 ## 🕹️ Core Features
 
 ### 1. The House (Main Hub)
