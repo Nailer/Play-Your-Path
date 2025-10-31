@@ -1,7 +1,7 @@
 # Play Your Path (PYP) 🌍
 
 Players play to progress as they learn about Hedera and earn points
-🏆 Hackathon Track: Onchain Finance & Real-World Assets (RWA)
+🏆 Hackathon Track: Gaming and NFTs
 
 PYP is more than a game — it's a proof-of-game platform, tracking user activities, rewarding progress with NFTs & tokens, and building a blockchain reputation.
 

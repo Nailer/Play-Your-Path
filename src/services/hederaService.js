@@ -275,21 +275,35 @@ export class HederaService {
     const toId = AccountId.fromString(toAccountId);
 
     let tx = new TransferTransaction();
+    const tokenIdObj = TokenId.fromString(tokenId);
 
     if (nftSerial) {
       // NFT transfer
-      const nftId = TokenId.fromString(tokenId).toNonFungibleToken(nftSerial);
-      tx = tx.addNftTransfer(nftId, fromId, toId);
+      // addNftTransfer takes: (tokenId, serialNumber, senderAccountId, receiverAccountId)
+      // Ensure serial number is a number
+      const serialNum = typeof nftSerial === 'string' ? parseInt(nftSerial, 10) : nftSerial;
+      tx = tx.addNftTransfer(tokenIdObj, serialNum, fromId, toId);
     } else {
       // Fungible transfer (amount in smallest units according to decimals)
-      tx = tx.addTokenTransfer(TokenId.fromString(tokenId), fromId, -amount)
-             .addTokenTransfer(TokenId.fromString(tokenId), toId, amount);
+      tx = tx.addTokenTransfer(tokenIdObj, fromId, -amount)
+             .addTokenTransfer(tokenIdObj, toId, amount);
     }
 
     const frozen = await tx.freezeWith(this.client).sign(fromKey);
     const submit = await frozen.execute(this.client);
-    await submit.getReceipt(this.client);
-    return { tokenId, to: toId.toString(), amount, nftSerial: nftSerial || null };
+    const receipt = await submit.getReceipt(this.client);
+    const txId = submit.transactionId.toString();
+    const status = receipt.status.toString();
+    
+    return { 
+      tokenId, 
+      to: toId.toString(), 
+      amount, 
+      nftSerial: nftSerial || null,
+      transactionId: txId,
+      status: status,
+      hashscanUrl: `https://hashscan.io/testnet/transaction/${txId}`
+    };
   }
 
   /**

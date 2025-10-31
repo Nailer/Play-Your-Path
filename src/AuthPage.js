@@ -47,17 +47,18 @@ export const AuthPage = () => {
         });
 
         if (hashconnect && hashconnect.pairingEvent) {
-          // Listen for pairing events
+          // Listen for pairing events (HashConnect v3)
           hashconnect.pairingEvent.on((pairingData) => {
             if (pairingData && pairingData.accountIds && pairingData.accountIds.length > 0) {
-              setAccountId(pairingData.accountIds[0]);
-              console.log("✅ Wallet connected:", pairingData.accountIds[0]);
+              const accountIdStr = pairingData.accountIds[0]; // Already string in v3
+              setAccountId(accountIdStr);
+              console.log("✅ Wallet connected:", accountIdStr);
             }
           });
 
-          // Check if already paired
-          if (hashconnect.pairingData && hashconnect.pairingData.accountIds) {
-            const existingAccountId = hashconnect.pairingData.accountIds[0];
+          // Check if already connected (HashConnect v3)
+          if (hashconnect.connectedAccountIds && hashconnect.connectedAccountIds.length > 0) {
+            const existingAccountId = hashconnect.connectedAccountIds[0].toString();
             if (existingAccountId) {
               setAccountId(existingAccountId);
             }
