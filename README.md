@@ -8,6 +8,22 @@ PYP is more than a game — it's a proof-of-game platform, tracking user activit
 ## HASHGRAPH HACKATHON SUBMISSION CERTIFICATE
 <a href="https://drive.google.com/file/d/1sOhaOhmrroKDrVZCI5MKa9dxdYDkEekH/view?usp=sharing"></a>
 
+## Hedera Integration Summary
+
+### Hedera Token Service (HTS):
+**In Play Your Path**, we leveraged HTS to create and manage in-game tokens and reward systems. Players **earn Hedera tokens** for completing tasks, learning modules, or interacting with other users — turning engagement into tangible on-chain value. **HTS was chosen for its scalability**, cost-efficiency, and **token programmability**, enabling seamless reward distribution and NFT minting without gas volatility. This empowers users to own, trade, and utilize assets natively on Hedera, fostering a sustainable play-to-earn economy.
+
+### Hedera Consensus Service (HCS):
+**HCS powers PYP’s Proof-of-Game system** — every player action, achievement, or AI interaction is logged immutably to establish a verifiable record of participation. This provides players with on-chain credentials that serve as digital reputations and proof of progress. **We chose HCS for its high throughput, timestamp accuracy, and low transaction cost**, ensuring that even complex, multi-player interactions remain transparent and cost-stable. The result is a gamified ecosystem that is fair, transparent, and trusted by design.
+
+## 🪙 Fundora – Hedera Integration Summary
+
+### Hedera Token Service (HTS):
+**We integrated HTS to handle all token-based crowdfunding transactions within Fundora**. Using HTS allows donations and fund transfers to be executed with fixed, predictable fees (as low as $0.0001 per transaction), making micro-contributions practical and affordable for African founders and supporters. **HTS ensures that each transaction is fast, secure, and transparent, eliminating intermediaries** while giving creators direct control of their funds. This predictability and efficiency are vital for Fundora’s goal of making fundraising accessible and sustainable across low-cost environments.
+
+### Hedera Consensus Service (HCS):
+**Fundora utilizes HCS for immutable logging of campaign activities and donation events**, ensuring every contribution, update, and milestone is recorded permanently on-chain. This creates a verifiable and tamper-proof history of campaign performance, promoting trust and transparency. **The low-cost, high-throughput nature of HCS makes it ideal for auditable records, giving donors confidence that their contributions are tracked and publicly visible** — a core value for building transparency in African crowdfunding.
+
 ## 🕹️ Core Features
 
 ### 1. The House (Main Hub)
