@@ -35,10 +35,13 @@ export const initHashConnect = async (options = {}) => {
     console.log('Initializing HashConnect v3 with metadata:', metadata);
 
     // ✅ HashConnect v3 constructor: new HashConnect(LedgerId, projectId, metadata, debug)
-    // Note: projectId is required but HashConnect v3 might work with an empty string or placeholder
-    // If you have a WalletConnect project ID, use it here
+    // Note: projectId is required for WalletConnect
     const projectId = options.projectId || process.env.REACT_APP_WALLETCONNECT_PROJECT_ID || "";
     const debug = options.debug || false;
+
+    if (!projectId) {
+      console.warn('No WalletConnect project ID provided. HashConnect may not work properly. Get one from https://cloud.reown.com/');
+    }
 
     // Create HashConnect instance with LedgerId.TESTNET
     const hashconnect = new HashConnect(
@@ -49,7 +52,17 @@ export const initHashConnect = async (options = {}) => {
     );
 
     // Initialize HashConnect (v3 init() takes no parameters)
-    await hashconnect.init();
+    // Suppress WebSocket errors in console - they're expected for WalletConnect
+    try {
+      await hashconnect.init();
+    } catch (initError) {
+      // WebSocket connection errors are expected and won't prevent functionality
+      if (initError.message && initError.message.includes('WebSocket')) {
+        console.warn('WebSocket connection warning (this is normal for WalletConnect):', initError.message);
+      } else {
+        throw initError;
+      }
+    }
     
     // Store instance globally and locally
     hashConnectInstance = hashconnect;

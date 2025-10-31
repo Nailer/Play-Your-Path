@@ -12,14 +12,18 @@ import {
   FaTimes,
   FaSpinner,
   FaCheckCircle,
-  FaExclamationTriangle
+  FaExclamationTriangle,
+  FaPlus,
+  FaWallet
 } from 'react-icons/fa';
 import { 
   getUserTalismans, 
   getTalismanCollections, 
   activateTalisman, 
-  deactivateTalisman 
+  deactivateTalisman,
+  getUserHederaAccount
 } from '../lib/supabase';
+import TalismanMintService from '../services/talismanMintService';
 import './TalismanCollection.css';
 
 const RARITY_COLORS = {
@@ -51,6 +55,8 @@ export default function TalismanCollection({ isOpen, onClose, userId }) {
   const [activeTalisman, setActiveTalisman] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [minting, setMinting] = useState(false);
+  const [mintingCollectionId, setMintingCollectionId] = useState(null);
 
   console.log('TalismanCollection render:', { isOpen, userId });
 
@@ -114,6 +120,90 @@ export default function TalismanCollection({ isOpen, onClose, userId }) {
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleMintTalisman = async (collection) => {
+    if (minting) return;
+    
+    try {
+      setMinting(true);
+      setMintingCollectionId(collection.id);
+      setError('');
+
+      // Check if user already owns this talisman
+      const alreadyOwned = talismans.some(t => t.collection_id === collection.id);
+      if (alreadyOwned) {
+        setError('You already own this talisman!');
+        return;
+      }
+
+      // Get user's Hedera account
+      const hederaAccount = await getUserHederaAccount(userId);
+      if (!hederaAccount || !hederaAccount.account_id) {
+        setError('Please create a Hedera account first. Go to your profile to create one.');
+        return;
+      }
+
+      console.log('Minting talisman with account:', hederaAccount.account_id);
+
+      // Check if collection has NFT ID deployed
+      if (!collection.nft_collection_id) {
+        setError('This talisman collection has not been deployed yet. Please contact the administrator.');
+        return;
+      }
+
+      // Mint the talisman
+      if (collection.perk_type === 'daily_planter') {
+        // Pass private key if available (for app-created accounts)
+        const result = await TalismanMintService.mintDailyPlanterTalisman(
+          userId,
+          hederaAccount.account_id,
+          collection,
+          hederaAccount.private_key || null
+        );
+
+        if (result.success) {
+          // Reload talismans to show the new one
+          await loadTalismanData();
+          
+          // Show success message with HashScan link and association instructions
+          const hashscanUrl = result.hashscanNftUrl || `https://hashscan.io/testnet/token/${collection.nft_collection_id}?serial=${result.nftSerialNumber}`;
+          const transferUrl = result.transferHashscanUrl;
+          
+          let successMessage = `🎉 Daily Planter Talisman minted successfully!\n\n` +
+            `NFT Serial: #${result.nftSerialNumber}\n` +
+            `Collection: ${collection.name}\n\n` +
+            `View NFT: ${hashscanUrl}`;
+          
+          if (transferUrl) {
+            successMessage += `\nTransfer Tx: ${transferUrl}`;
+          }
+          
+          successMessage += `\n\n⚠️ IMPORTANT: If you don't see the NFT in your wallet:\n` +
+            `1. Open HashPack wallet\n` +
+            `2. Go to Assets tab\n` +
+            `3. Click "Add Token" or search for: ${collection.nft_collection_id}\n` +
+            `4. Associate the token with your account\n` +
+            `5. The NFT will then appear in your wallet\n\n` +
+            `The NFT has been minted and transferred - you just need to associate the token to see it!`;
+          
+          alert(successMessage);
+          
+          // Optionally open HashScan in new tab
+          if (window.confirm('Would you like to view your NFT on HashScan?')) {
+            window.open(hashscanUrl, '_blank');
+          }
+        }
+      } else {
+        setError('Only Daily Planter talisman can be minted from this interface for now.');
+      }
+    } catch (err) {
+      console.error('Minting error:', err);
+      setError(err.message || 'Failed to mint talisman. Make sure your Hedera account is set up and has sufficient balance.');
+    } finally {
+      setMinting(false);
+      setMintingCollectionId(null);
     }
   };
 
@@ -266,33 +356,59 @@ export default function TalismanCollection({ isOpen, onClose, userId }) {
           )}
         </div>
 
-        {/* Available Collections (for future minting) */}
+        {/* Available Collections (for minting) */}
         <div className="available-collections-section">
           <h3>Available Collections</h3>
           <div className="collections-grid">
-            {collections.map(collection => (
-              <div key={collection.id} className="collection-card">
-                <div className="collection-emoji">{collection.emoji}</div>
-                <div className="collection-info">
-                  <div className="collection-name">
-                    {collection.name}
-                    {getRarityIcon(collection.rarity)}
+            {collections.map(collection => {
+              const isOwned = talismans.some(t => t.collection_id === collection.id);
+              const isMinting = minting && mintingCollectionId === collection.id;
+              const canMint = collection.perk_type === 'daily_planter' && !isOwned;
+              
+              return (
+                <div key={collection.id} className="collection-card">
+                  <div className="collection-emoji">{collection.emoji}</div>
+                  <div className="collection-info">
+                    <div className="collection-name">
+                      {collection.name}
+                      {getRarityIcon(collection.rarity)}
+                    </div>
+                    <div className="collection-description">{collection.description}</div>
+                    <div className="collection-perks">
+                      {getPerkIcon(collection.perk_type)}
+                      <span>{formatPerkConfig(collection.perk_type, collection.perk_config)}</span>
+                    </div>
                   </div>
-                  <div className="collection-description">{collection.description}</div>
-                  <div className="collection-perks">
-                    {getPerkIcon(collection.perk_type)}
-                    <span>{formatPerkConfig(collection.perk_type, collection.perk_config)}</span>
+                  <div className="collection-actions">
+                    {isOwned ? (
+                      <span className="owned-badge">
+                        <FaCheckCircle /> Owned
+                      </span>
+                    ) : canMint ? (
+                      <button
+                        className="mint-btn"
+                        onClick={() => handleMintTalisman(collection)}
+                        disabled={minting || loading}
+                      >
+                        {isMinting ? (
+                          <>
+                            <FaSpinner className="spinner-icon" />
+                            Minting...
+                          </>
+                        ) : (
+                          <>
+                            <FaPlus />
+                            Mint NFT
+                          </>
+                        )}
+                      </button>
+                    ) : (
+                      <span className="not-owned-badge">Not Available</span>
+                    )}
                   </div>
                 </div>
-                <div className="collection-status">
-                  {talismans.some(t => t.collection_id === collection.id) ? (
-                    <span className="owned-badge">Owned</span>
-                  ) : (
-                    <span className="not-owned-badge">Not Owned</span>
-                  )}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>

@@ -308,26 +308,68 @@
   color: #6b7280;
 }
 
+.collection-actions {
+  min-width: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .collection-status {
   min-width: 80px;
   text-align: center;
 }
 
+.mint-btn {
+  background: linear-gradient(135deg, #8b5cf6, #6366f1);
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.mint-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #7c3aed, #4f46e5);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+}
+
+.mint-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.mint-btn .spinner-icon {
+  animation: spin 1s linear infinite;
+}
+
 .owned-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   background: rgba(34, 197, 94, 0.2);
   color: #22c55e;
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 10px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px;
   font-weight: 600;
 }
 
 .not-owned-badge {
   background: rgba(107, 114, 128, 0.2);
   color: #6b7280;
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 10px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px;
   font-weight: 600;
 }
 

@@ -162,7 +162,7 @@ export class WalletService {
   }
 
   /**
-   * Get NFT collection for an account
+   * Get NFT collection for an account - Simplified and faster
    */
   static async getNftCollection(accountId) {
     if (!accountId) {
@@ -173,33 +173,48 @@ export class WalletService {
     }
 
     try {
-      const response = await fetch(
-        `https://testnet.mirrornode.hedera.com/api/v1/accounts/${accountId}/nfts?limit=100&order=desc`
-      );
+      // Clean account ID
+      const cleanAccountId = accountId.trim();
+      
+      // Use simpler endpoint with better error handling
+      const url = `https://testnet.mirrornode.hedera.com/api/v1/accounts/${cleanAccountId}/nfts?limit=100&order=desc`;
+      console.log('Fetching NFTs from:', url);
+      
+      const response = await fetch(url);
 
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`NFT fetch failed (${response.status}):`, errorText);
+        // Return empty array instead of throwing for better UX
+        if (response.status === 404) {
+          return [];
+        }
         throw new Error(`Failed to fetch NFTs: ${response.status}`);
       }
 
       const data = await response.json();
-      const nfts = data.nfts || [];
+      console.log('NFT data received:', data);
+      
+      const nfts = data.nfts || data || [];
+      console.log(`Found ${nfts.length} NFTs`);
 
       return nfts.map(nft => ({
-        tokenId: nft.token_id,
-        serialNumber: nft.serial_number,
-        hashscanUrl: `https://hashscan.io/testnet/token/${nft.token_id}?serial=${nft.serial_number}`,
-        accountHashscanUrl: `https://hashscan.io/testnet/token/${nft.token_id}`,
+        tokenId: nft.token_id || nft.tokenId,
+        serialNumber: nft.serial_number || nft.serialNumber,
+        hashscanUrl: `https://hashscan.io/testnet/token/${nft.token_id || nft.tokenId}?serial=${nft.serial_number || nft.serialNumber}`,
+        accountHashscanUrl: `https://hashscan.io/testnet/token/${nft.token_id || nft.tokenId}`,
         metadata: nft.metadata || null,
-        timestamp: nft.created_timestamp
+        timestamp: nft.created_timestamp || nft.timestamp
       }));
     } catch (error) {
       console.error('Error fetching NFT collection:', error);
-      throw error;
+      // Return empty array instead of throwing
+      return [];
     }
   }
 
   /**
-   * Get token balances for an account
+   * Get token balances for an account - Simplified and faster
    */
   static async getTokenBalances(accountId) {
     if (!accountId) {
@@ -210,46 +225,93 @@ export class WalletService {
     }
 
     try {
-      const response = await fetch(
-        `https://testnet.mirrornode.hedera.com/api/v1/accounts/${accountId}/tokens?limit=100`
-      );
+      // Clean account ID
+      const cleanAccountId = accountId.trim();
+      
+      // Use balances endpoint which includes all tokens
+      const url = `https://testnet.mirrornode.hedera.com/api/v1/balances?account.id=${cleanAccountId}`;
+      console.log('Fetching token balances from:', url);
+      
+      const response = await fetch(url);
 
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`Token balance fetch failed (${response.status}):`, errorText);
+        // Return empty array instead of throwing for better UX
+        if (response.status === 404) {
+          return [];
+        }
         throw new Error(`Failed to fetch token balances: ${response.status}`);
       }
 
       const data = await response.json();
-      const tokens = data.tokens || [];
+      console.log('Token balance data received:', data);
+      
+      // The balances endpoint returns balances array
+      const balances = data.balances || [];
+      
+      if (balances.length === 0) {
+        return [];
+      }
 
-      // Get balance for each token
-      const balances = await Promise.all(
+      // Get the first balance object (for the account)
+      const accountBalance = balances[0];
+      const tokens = accountBalance.tokens || [];
+      
+      console.log(`Found ${tokens.length} tokens`);
+
+      // Transform token data
+      const tokenBalances = await Promise.all(
         tokens.map(async (token) => {
           try {
-            const balanceResponse = await fetch(
-              `https://testnet.mirrornode.hedera.com/api/v1/accounts/${accountId}/tokens/${token.token_id}`
-            );
-            if (balanceResponse.ok) {
-              const balanceData = await balanceResponse.json();
-              return {
-                tokenId: token.token_id,
-                tokenSymbol: token.symbol || 'N/A',
-                tokenName: token.name || 'Unknown Token',
-                balance: balanceData.balance || 0,
-                decimals: token.decimals || 0,
-                hashscanUrl: `https://hashscan.io/testnet/token/${token.token_id}`
-              };
+            // Get token info for name and symbol
+            const tokenInfoUrl = `https://testnet.mirrornode.hedera.com/api/v1/tokens/${token.token_id}`;
+            let tokenInfo = null;
+            
+            try {
+              const infoResponse = await fetch(tokenInfoUrl);
+              if (infoResponse.ok) {
+                tokenInfo = await infoResponse.json();
+              }
+            } catch (err) {
+              console.warn(`Could not fetch token info for ${token.token_id}:`, err);
             }
+
+            // Calculate actual balance considering decimals
+            const decimals = tokenInfo?.decimals || 0;
+            const rawBalance = parseInt(token.balance || '0');
+            const actualBalance = decimals > 0 ? rawBalance / Math.pow(10, decimals) : rawBalance;
+
+            return {
+              tokenId: token.token_id,
+              tokenSymbol: tokenInfo?.symbol || token.symbol || 'N/A',
+              tokenName: tokenInfo?.name || token.name || 'Unknown Token',
+              balance: actualBalance,
+              rawBalance: rawBalance,
+              decimals: decimals,
+              hashscanUrl: `https://hashscan.io/testnet/token/${token.token_id}`
+            };
           } catch (err) {
-            console.error(`Error fetching balance for token ${token.token_id}:`, err);
+            console.error(`Error processing token ${token.token_id}:`, err);
+            // Return basic info even if details fail
+            return {
+              tokenId: token.token_id,
+              tokenSymbol: 'N/A',
+              tokenName: 'Unknown Token',
+              balance: parseInt(token.balance || '0'),
+              rawBalance: parseInt(token.balance || '0'),
+              decimals: 0,
+              hashscanUrl: `https://hashscan.io/testnet/token/${token.token_id}`
+            };
           }
-          return null;
         })
       );
 
-      return balances.filter(b => b !== null);
+      return tokenBalances.filter(b => b && b.balance > 0); // Only return tokens with balance
     } catch (error) {
       console.error('Error fetching token balances:', error);
-      throw error;
+      // Return empty array instead of throwing
+      return [];
     }
   }
 }
