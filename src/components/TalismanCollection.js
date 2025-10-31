@@ -3,10 +3,9 @@ import {
   FaGem, 
   FaStar, 
   FaCrown, 
-  FaShield, 
   FaBrain, 
   FaLeaf, 
-  FaClover, 
+  FaDice, 
   FaBolt, 
   FaAngellist,
   FaHome,
@@ -41,7 +40,7 @@ const PERK_ICONS = {
   home_defense: FaHome,
   scholar: FaBrain,
   daily_planter: FaLeaf,
-  lucky_charm: FaClover,
+  lucky_charm: FaDice,
   speed_demon: FaBolt,
   guardian_angel: FaAngellist
 };

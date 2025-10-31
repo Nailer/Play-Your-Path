@@ -5,7 +5,6 @@ import HederaAccountSetup from "./HederaAccountSetup.js";
 import UserProfile from "./components/UserProfile.js";
 import { createUserProfile, createHederaAccount } from "./lib/supabase.js";
 import { initHashConnect } from "./utils/hashconnect.js";
-import { useNavigate } from "react-router-dom";
 // import CreateTokenForm from "./components/CreateTokenForm";
 import { FaSignOutAlt, FaUser, FaWallet } from 'react-icons/fa';
 
@@ -15,7 +14,6 @@ export const AuthPage = () => {
   const [showHederaSetup, setShowHederaSetup] = useState(false);
   const [showUserProfile, setShowUserProfile] = useState(false);
   const [accountId, setAccountId] = useState(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
     // Check for existing auth state
@@ -31,29 +29,47 @@ export const AuthPage = () => {
     }
   }, []);
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate("/", { replace: true });
-    }
-  }, [isAuthenticated, navigate]);
-
   ////////////////////////////// hashconnect useEffect /////////////////////////////
   useEffect(() => {
-    const connectWallet = async () => {
-      const hashconnect = await initHashConnect({
-        name: "My Hedera dApp",
-        description: "Learn & earn with Hedera",
-        icon: "https://hedera.com/favicon.ico",
-        url: "http://localhost:3000",
-      });
+    const initializeWallet = async () => {
+      try {
+        // Only initialize if we're in the browser
+        if (typeof window === 'undefined') {
+          return;
+        }
 
-      hashconnect.pairingEvent.on((pairingData) => {
-        setAccountId(pairingData.accountIds[0]);
-        console.log("✅ Wallet connected:", pairingData.accountIds[0]);
-      });
+        // Initialize HashConnect (this will be used when user clicks "Connect with HashPack")
+        const hashconnect = await initHashConnect({
+          name: "Play Your Path",
+          description: "Learn & earn with Hedera",
+          icon: `${window.location.origin}/logo192.png`,
+          url: window.location.origin,
+        });
+
+        if (hashconnect && hashconnect.pairingEvent) {
+          // Listen for pairing events
+          hashconnect.pairingEvent.on((pairingData) => {
+            if (pairingData && pairingData.accountIds && pairingData.accountIds.length > 0) {
+              setAccountId(pairingData.accountIds[0]);
+              console.log("✅ Wallet connected:", pairingData.accountIds[0]);
+            }
+          });
+
+          // Check if already paired
+          if (hashconnect.pairingData && hashconnect.pairingData.accountIds) {
+            const existingAccountId = hashconnect.pairingData.accountIds[0];
+            if (existingAccountId) {
+              setAccountId(existingAccountId);
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error initializing HashConnect:", error);
+        // Don't block the app if HashConnect fails to initialize
+      }
     };
 
-    connectWallet();
+    initializeWallet();
   }, []);
 
   const handleLogin = async (userData) => {

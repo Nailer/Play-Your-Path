@@ -1,6 +1,7 @@
 # Play Your Path (PYP) 🌍
 
-Play Your Path (PYP) is a decentralized African-inspired social gaming world built on Hedera. It blends learning, gaming, community, and rewards into one immersive experience. Users begin in The House, a symbolic hub where they explore different rooms, interact with AI, earn rewards, and teleport ("juju portals") to other worlds.
+Players play to progress as they learn about Hedera and earn points
+🏆 Hackathon Track: Onchain Finance & Real-World Assets (RWA)
 
 PYP is more than a game — it's a proof-of-game platform, tracking user activities, rewarding progress with NFTs & tokens, and building a blockchain reputation.
 
