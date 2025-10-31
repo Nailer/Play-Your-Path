@@ -9,7 +9,7 @@ PYP is more than a game — it's a proof-of-game platform, tracking user activit
 <a href="https://drive.google.com/file/d/1sOhaOhmrroKDrVZCI5MKa9dxdYDkEekH/view?usp=sharing">View Certificate</a>
 
 ## Demo Video
-<a href="https://youtu.be/TLMQPFt7dDs">View Presentation</a>
+<a href="https://youtu.be/TLMQPFt7dDs">View Demo Video</a>
 
 ## Presentation Slides
 <a href="https://play-your-path-pyp-the-c-2ewouu5.gamma.site/">View Presentation</a>
