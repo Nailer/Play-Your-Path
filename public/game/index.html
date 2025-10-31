@@ -10,7 +10,7 @@
 
 <link rel="shortcut icon" href="favicon.png" type="image/x-icon" />
 
-<!-- <link  href="http://fonts.googleapis.com/css?family=Neuton:regular,italic" rel="stylesheet" type="text/css" > -->
+<!-- <link href="http://fonts.googleapis.com/css?family=Neuton:regular,italic" rel="stylesheet" type="text/css" > -->
 <link rel="stylesheet" type="text/css" href="css/styles.css" />
 
 <!-- <script src="js/libs/less-1.1.3.min.js" ></script> -->
@@ -58,44 +58,27 @@ Modernizr.load({
 				]
 });
 
-// PYP overlay/menu and portal controls
-var pypOverlay = document.createElement('div');
-pypOverlay.id = 'pyp-overlay';
-pypOverlay.style.position = 'fixed';
-pypOverlay.style.top = '12px';
-pypOverlay.style.right = '12px';
-pypOverlay.style.zIndex = '9999';
-pypOverlay.style.display = 'flex';
-pypOverlay.style.gap = '8px';
-
-function mkBtn(label, onClick){
-    var b = document.createElement('button');
-    b.textContent = label;
-    b.style.padding = '8px 10px';
-    b.style.cursor = 'pointer';
-    b.onclick = onClick;
-    return b;
-}
-
-var learnBtn = mkBtn('Learn', function(){ window.postMessage({type:'PYP_MODE', mode:'learn'}, '*'); });
-var playBtn = mkBtn('Play', function(){ window.postMessage({type:'PYP_MODE', mode:'play'}, '*'); });
-var tradeBtn = mkBtn('Trade', function(){ window.postMessage({type:'PYP_MODE', mode:'trade'}, '*'); });
-var governBtn = mkBtn('Govern', function(){ window.postMessage({type:'PYP_MODE', mode:'govern'}, '*'); });
-var teleportBtn = mkBtn('Teleport', function(){ window.location.href = 'village.html'; });
-
-pypOverlay.appendChild(learnBtn);
-pypOverlay.appendChild(playBtn);
-pypOverlay.appendChild(tradeBtn);
-pypOverlay.appendChild(governBtn);
-pypOverlay.appendChild(teleportBtn);
-
-document.body.appendChild(pypOverlay);
+// PYP overlay/menu and portal controls - will be initialized after DOM loads
 
 // Hedera hooks stub
 window.PYP = window.PYP || {};
 window.PYP.login = function(provider){ console.log('Hedera login placeholder', provider); };
 window.PYP.mintBadge = function(badgeId){ console.log('Mint NFT badge placeholder', badgeId); };
 window.PYP.rewardTokens = function(amount){ console.log('Reward tokens placeholder', amount); };
+
+// Summon/Quest hooks
+window.PYP.createSummon = function(kind){ 
+    return window.parent.postMessage({type:'PYP_SUMMON_CREATE', kind: kind}, '*'); 
+};
+window.PYP.joinSummon = function(code){ 
+    return window.parent.postMessage({type:'PYP_SUMMON_JOIN', code: code}, '*'); 
+};
+window.PYP.assignQuest = function(questCode){ 
+    return window.parent.postMessage({type:'PYP_QUEST_ASSIGN', questCode: questCode}, '*'); 
+};
+window.PYP.completeQuest = function(questCode){ 
+    return window.parent.postMessage({type:'PYP_QUEST_COMPLETE', questCode: questCode}, '*'); 
+};
 
 </script>
 
@@ -153,6 +136,427 @@ window.PYP.rewardTokens = function(amount){ console.log('Reward tokens placehold
 		remove_information = document.getElementById('information');
 
 	container.removeChild(remove_information);
+
+	// Initialize PYP overlay after DOM is ready
+	function initPYPOverlay() {
+		var pypOverlay = document.createElement('div');
+		pypOverlay.id = 'pyp-overlay';
+		pypOverlay.style.cssText = `
+			position: fixed;
+			bottom: 12px;
+			right: 12px;
+			z-index: 9999;
+			display: flex;
+			gap: 8px;
+			flex-wrap: wrap;
+			max-width: 300px;
+		`;
+
+		function mkBtn(label, onClick, color = '#4CAF50'){
+			var b = document.createElement('button');
+			b.textContent = label;
+			b.style.cssText = `
+				padding: 8px 12px;
+				cursor: pointer;
+				background: ${color};
+				color: white;
+				border: none;
+				border-radius: 4px;
+				font-size: 12px;
+				font-weight: bold;
+				box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+				transition: all 0.2s;
+			`;
+			b.onmouseover = function() { this.style.opacity = '0.8'; };
+			b.onmouseout = function() { this.style.opacity = '1'; };
+			b.onclick = onClick;
+			return b;
+		}
+
+		var learnBtn = mkBtn('Learn', function(){ window.parent.postMessage({type:'PYP_MODE', mode:'learn'}, '*'); }, '#2196F3');
+		var playBtn = mkBtn('Play', function(){ window.parent.postMessage({type:'PYP_MODE', mode:'play'}, '*'); }, '#FF9800');
+		var tradeBtn = mkBtn('Trade', function(){ window.parent.postMessage({type:'PYP_MODE', mode:'trade'}, '*'); }, '#9C27B0');
+		var governBtn = mkBtn('Govern', function(){ window.parent.postMessage({type:'PYP_MODE', mode:'govern'}, '*'); }, '#F44336');
+		var teleportBtn = mkBtn('Teleport', function(){ window.location.href = 'village.html'; }, '#607D8B');
+		var associateBtn = mkBtn('Associate Token', function(){ window.parent.postMessage({type:'PYP_ASSOCIATE'}, '*'); }, '#10B981');
+		var talismanBtn = mkBtn('Talismans', function(){ 
+			console.log('Talisman button clicked, sending message');
+			window.parent.postMessage({type:'PYP_TALISMAN_COLLECTION'}, '*'); 
+		}, '#8B5CF6');
+		var summonBtn = mkBtn('Summon', function(){ window.parent.postMessage({type:'PYP_SUMMON', action:'create'}, '*'); }, '#4CAF50');
+		var joinBtn = mkBtn('Join', function(){ 
+			var code = prompt('Enter invite code:');
+			if (code) window.parent.postMessage({type:'PYP_SUMMON', action:'join', code: code}, '*'); 
+		}, '#FF5722');
+		
+		// No visible demo toggle in UI
+
+		pypOverlay.appendChild(learnBtn);
+		pypOverlay.appendChild(playBtn);
+		pypOverlay.appendChild(tradeBtn);
+		pypOverlay.appendChild(governBtn);
+		pypOverlay.appendChild(teleportBtn);
+		pypOverlay.appendChild(associateBtn);
+		pypOverlay.appendChild(talismanBtn);
+		pypOverlay.appendChild(summonBtn);
+		pypOverlay.appendChild(joinBtn);
+		// demo button removed to keep demo mode unobtrusive
+
+		document.body.appendChild(pypOverlay);
+
+		// Add quest status display
+		var questStatus = document.createElement('div');
+		questStatus.id = 'quest-status';
+		questStatus.style.cssText = `
+			position: fixed;
+			top: 12px;
+			left: 12px;
+			z-index: 9999;
+			background: rgba(0,0,0,0.8);
+			color: white;
+			padding: 12px;
+			border-radius: 8px;
+			font-family: Arial, sans-serif;
+			font-size: 12px;
+			max-width: 250px;
+			display: none;
+		`;
+		questStatus.innerHTML = `
+			<div style="font-weight: bold; margin-bottom: 8px;">🎯 Active Quests</div>
+			<div id="quest-list">No active quests</div>
+			<div style="margin-top: 8px; font-size: 10px; opacity: 0.7;">
+				Ask the Oracle Fish for quests!
+			</div>
+		`;
+		document.body.appendChild(questStatus);
+
+		// Remove demo instructions overlay to keep demo mode unobtrusive
+
+		// Show/hide quest status
+		window.PYP.showQuestStatus = function(quests) {
+			var questList = document.getElementById('quest-list');
+			if (quests && quests.length > 0) {
+				questStatus.style.display = 'block';
+				questList.innerHTML = quests.map(q => `• ${q.title} (+${q.reward_points}pts)`).join('<br>');
+			} else {
+				questStatus.style.display = 'none';
+			}
+		};
+
+		// Silently enable demo mode when not logged in
+		try {
+			var savedAuth = localStorage.getItem('pyp-auth');
+			if (!savedAuth) {
+				window.PYP.demoMode = true;
+			}
+		} catch (e) {}
+
+		// Ensure daily claim bind even with minified scripts
+		function bindDailyClaimOnce() {
+			var el = document.getElementById('plant_check');
+			if (el && !el.getAttribute('data-pyp-bound')) {
+				el.setAttribute('data-pyp-bound', '1');
+				el.addEventListener('click', function(){
+					window.parent.postMessage({ type: 'PYP_DAILY_CLAIM' }, '*');
+				});
+				return true;
+			}
+			return false;
+		}
+		// Try immediately, then observe DOM changes
+		if (!bindDailyClaimOnce()) {
+			var observer = new MutationObserver(function(){
+				if (bindDailyClaimOnce()) {
+					observer.disconnect();
+				}
+			});
+			observer.observe(document.body, { childList: true, subtree: true });
+		}
+
+		// Notification system
+		window.PYP.showNotification = function(message, type = 'info') {
+			var notification = document.createElement('div');
+			notification.style.cssText = `
+				position: fixed;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+				z-index: 10000;
+				background: ${type === 'success' ? '#4CAF50' : type === 'error' ? '#F44336' : '#2196F3'};
+				color: white;
+				padding: 16px 24px;
+				border-radius: 8px;
+				font-family: Arial, sans-serif;
+				font-size: 14px;
+				font-weight: bold;
+				box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+				animation: slideIn 0.3s ease-out;
+			`;
+			notification.textContent = message;
+			
+			// Add animation styles
+			var style = document.createElement('style');
+			style.textContent = `
+				@keyframes slideIn {
+					from { opacity: 0; transform: translate(-50%, -60%); }
+					to { opacity: 1; transform: translate(-50%, -50%); }
+				}
+			`;
+			document.head.appendChild(style);
+			
+			document.body.appendChild(notification);
+			
+			// Auto remove after 3 seconds
+			setTimeout(() => {
+				if (notification.parentNode) {
+					notification.style.animation = 'slideIn 0.3s ease-out reverse';
+					setTimeout(() => notification.remove(), 300);
+				}
+			}, 3000);
+		};
+
+		// Enhanced Daily reward modal with minting animation
+		(function setupDailyRewardModal(){
+			var modal = document.createElement('div');
+			modal.id = 'pyp-daily-modal';
+			modal.style.cssText = `
+				position: fixed;
+				top: 0; left: 0; right: 0; bottom: 0;
+				background: rgba(0,0,0,0.8);
+				display: none;
+				align-items: center;
+				justify-content: center;
+				z-index: 10001;
+			`;
+			var card = document.createElement('div');
+			card.style.cssText = `
+				background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+				border: 2px solid rgba(34, 197, 94, 0.3);
+				border-radius: 20px;
+				padding: 32px;
+				width: 380px;
+				color: #fff;
+				font-family: Arial, sans-serif;
+				box-shadow: 0 25px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(34, 197, 94, 0.1);
+				transform: scale(0.8);
+				opacity: 0;
+				transition: all .4s cubic-bezier(0.34, 1.56, 0.64, 1);
+				text-align: center;
+				position: relative;
+				overflow: hidden;
+			`;
+			
+			// Add animated background particles
+			var particles = document.createElement('div');
+			particles.style.cssText = `
+				position: absolute;
+				top: 0; left: 0; right: 0; bottom: 0;
+				pointer-events: none;
+				overflow: hidden;
+			`;
+			card.appendChild(particles);
+			
+			card.innerHTML += `
+				<div style="position: relative; z-index: 2;">
+					<div style="font-size:24px; font-weight:800; margin-bottom:12px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+						<span style="font-size: 28px;">🌱</span>
+						<span>Daily Plant Reward</span>
+					</div>
+					<div id="pyp-daily-msg" style="font-size:14px; opacity:.9; margin-bottom:20px; line-height: 1.4;">
+						Click the plant to claim your daily reward!
+					</div>
+					
+					<!-- Minting Progress -->
+					<div id="pyp-minting-progress" style="display: none; margin: 20px 0;">
+						<div style="font-size: 16px; font-weight: 600; margin-bottom: 12px; color: #22c55e;">
+							🪙 Minting Plant Tokens...
+						</div>
+						<div style="background: rgba(255,255,255,0.1); border-radius: 10px; height: 8px; overflow: hidden; margin-bottom: 8px;">
+							<div id="pyp-progress-bar" style="background: linear-gradient(90deg, #22c55e, #84cc16); height: 100%; width: 0%; transition: width 0.3s ease; border-radius: 10px;"></div>
+						</div>
+						<div id="pyp-progress-text" style="font-size: 12px; opacity: 0.8;">Connecting to Hedera...</div>
+					</div>
+					
+					<!-- Success Animation -->
+					<div id="pyp-success-animation" style="display: none; margin: 20px 0;">
+						<div style="font-size: 48px; margin-bottom: 12px; animation: bounce 0.6s ease;">🎉</div>
+						<div style="font-size: 18px; font-weight: 700; color: #22c55e; margin-bottom: 8px;">Reward Claimed!</div>
+					<div id="pyp-daily-points" style="font-size:36px; line-height:1; margin: 8px 0; font-weight:800; background: linear-gradient(90deg,#22c55e,#84cc16,#fbbf24); -webkit-background-clip:text; -webkit-text-fill-color:transparent; animation: glow 2s ease-in-out infinite alternate;">+10</div>
+					<div id="pyp-bonus-message" style="font-size: 12px; opacity: 0.7; color: #22c55e; font-weight: 600; margin-top: 4px;"></div>
+					<div style="font-size: 12px; opacity: 0.7;">Plant tokens minted to your wallet!</div>
+					</div>
+					
+					<!-- Error State -->
+					<div id="pyp-error-state" style="display: none; margin: 20px 0;">
+						<div style="font-size: 36px; margin-bottom: 12px;">⚠️</div>
+						<div style="font-size: 16px; font-weight: 600; color: #ef4444; margin-bottom: 8px;">Claim Failed</div>
+						<div id="pyp-error-msg" style="font-size: 12px; opacity: 0.8;">Please try again later</div>
+					</div>
+					
+					<button id="pyp-daily-close" style="margin-top:20px; padding:12px 20px; border:none; border-radius:12px; cursor:pointer; background: linear-gradient(135deg, #334155, #475569); color:#e5e7eb; font-weight:600; font-size: 14px; transition: all 0.2s ease;">Close</button>
+				</div>
+			`;
+			
+			// Add CSS animations
+			var style = document.createElement('style');
+			style.textContent = `
+				@keyframes bounce {
+					0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+					40% { transform: translateY(-10px); }
+					60% { transform: translateY(-5px); }
+				}
+				@keyframes glow {
+					from { filter: drop-shadow(0 0 5px rgba(34, 197, 94, 0.5)); }
+					to { filter: drop-shadow(0 0 20px rgba(34, 197, 94, 0.8)); }
+				}
+				@keyframes float {
+					0%, 100% { transform: translateY(0px); }
+					50% { transform: translateY(-10px); }
+				}
+				@keyframes sparkle {
+					0%, 100% { opacity: 0; transform: scale(0); }
+					50% { opacity: 1; transform: scale(1); }
+				}
+			`;
+			document.head.appendChild(style);
+			
+			// Create floating particles
+			function createParticle() {
+				var particle = document.createElement('div');
+				particle.style.cssText = `
+					position: absolute;
+					width: 4px; height: 4px;
+					background: #22c55e;
+					border-radius: 50%;
+					animation: float 3s ease-in-out infinite;
+					left: ${Math.random() * 100}%;
+					top: ${Math.random() * 100}%;
+					animation-delay: ${Math.random() * 2}s;
+				`;
+				particles.appendChild(particle);
+				setTimeout(() => particle.remove(), 3000);
+			}
+			
+			// Start particle animation
+			setInterval(createParticle, 500);
+			
+			modal.appendChild(card);
+			document.body.appendChild(modal);
+
+			function showMintingProgress() {
+				document.getElementById('pyp-minting-progress').style.display = 'block';
+				document.getElementById('pyp-success-animation').style.display = 'none';
+				document.getElementById('pyp-error-state').style.display = 'none';
+				
+				var progressBar = document.getElementById('pyp-progress-bar');
+				var progressText = document.getElementById('pyp-progress-text');
+				
+				var steps = [
+					{ width: 20, text: 'Connecting to Hedera...' },
+					{ width: 40, text: 'Associating token...' },
+					{ width: 60, text: 'Minting Plant tokens...' },
+					{ width: 80, text: 'Transferring to wallet...' },
+					{ width: 100, text: 'Finalizing transaction...' }
+				];
+				
+				var currentStep = 0;
+				var interval = setInterval(() => {
+					if (currentStep < steps.length) {
+						progressBar.style.width = steps[currentStep].width + '%';
+						progressText.textContent = steps[currentStep].text;
+						currentStep++;
+					} else {
+						clearInterval(interval);
+					}
+				}, 800);
+			}
+
+			function showSuccess(points, bonusMessage) {
+				document.getElementById('pyp-minting-progress').style.display = 'none';
+				document.getElementById('pyp-success-animation').style.display = 'block';
+				document.getElementById('pyp-error-state').style.display = 'none';
+				
+				var pointsEl = document.getElementById('pyp-daily-points');
+				var bonusEl = document.getElementById('pyp-bonus-message');
+				pointsEl.textContent = `+${points}`;
+				bonusEl.textContent = bonusMessage || '';
+				
+				// Add confetti effect
+				for (let i = 0; i < 20; i++) {
+					setTimeout(() => {
+						var confetti = document.createElement('div');
+						confetti.style.cssText = `
+							position: absolute;
+							width: 6px; height: 6px;
+							background: ${['#22c55e', '#84cc16', '#fbbf24', '#f59e0b'][Math.floor(Math.random() * 4)]};
+							left: ${Math.random() * 100}%;
+							top: -10px;
+							animation: sparkle 1s ease-out forwards;
+							pointer-events: none;
+						`;
+						modal.appendChild(confetti);
+						setTimeout(() => confetti.remove(), 1000);
+					}, i * 50);
+				}
+			}
+
+			function showError(message) {
+				document.getElementById('pyp-minting-progress').style.display = 'none';
+				document.getElementById('pyp-success-animation').style.display = 'none';
+				document.getElementById('pyp-error-state').style.display = 'block';
+				document.getElementById('pyp-error-msg').textContent = message;
+			}
+
+			function openModal(message, ok, points, bonusMessage){
+				var msg = document.getElementById('pyp-daily-msg');
+				msg.textContent = message || 'Click the plant to claim your daily reward!';
+				
+				modal.style.display = 'flex';
+				requestAnimationFrame(function(){ 
+					card.style.transform = 'scale(1)'; 
+					card.style.opacity = '1'; 
+				});
+				
+				if (ok && typeof points === 'number') {
+					showMintingProgress();
+					setTimeout(() => showSuccess(points, bonusMessage), 3000);
+				} else if (ok === false) {
+					showError(message || 'Unable to claim reward');
+				}
+			}
+
+			function closeModal(){
+				card.style.transform = 'scale(0.8)';
+				card.style.opacity = '0';
+				setTimeout(function(){ modal.style.display = 'none'; }, 400);
+			}
+
+			card.querySelector('#pyp-daily-close').addEventListener('click', closeModal);
+			modal.addEventListener('click', function(e){ if (e.target === modal) closeModal(); });
+
+			// Expose helper on PYP for optional manual open
+			window.PYP.openDailyModal = function(message, ok, points){ openModal(message, ok, points); };
+
+			// Listen for result messages from parent
+			window.addEventListener('message', function(ev){
+				if (!ev.data || typeof ev.data !== 'object') return;
+				if (ev.data.type === 'PYP_DAILY_RESULT') {
+					openModal(ev.data.message, !!ev.data.ok, ev.data.points, ev.data.bonusMessage);
+				}
+			});
+		})();
+
+		// No welcome popups to keep UI clean during demo
+
+		console.log('PYP Overlay and Quest Status initialized');
+	}
+
+	// Initialize overlay when DOM is ready
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', initPYPOverlay);
+	} else {
+		initPYPOverlay();
+	}
 
 	var _gaq = _gaq || [];
 	_gaq.push(['_setAccount', 'UA-34088292-1']);

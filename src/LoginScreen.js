@@ -1,6 +1,16 @@
 import React, { useState } from 'react';
 import './LoginScreen.css';
 import { AuthService } from './services/authService.js';
+import { 
+  FaWallet, 
+  FaEnvelope, 
+  FaLock, 
+  FaUser, 
+  FaSpinner, 
+  FaExclamationTriangle,
+  FaSignInAlt,
+  FaUserPlus
+} from 'react-icons/fa';
 
 const LoginScreen = ({ onLogin }) => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -96,7 +106,12 @@ const LoginScreen = ({ onLogin }) => {
           </button>
         </div>
 
-        {error && <div className="error-message">{error}</div>}
+        {error && (
+          <div className="error-message">
+            <FaExclamationTriangle className="error-icon" />
+            {error}
+          </div>
+        )}
 
         <div className="auth-methods">
           {/* HashPack Wallet Login */}
@@ -106,7 +121,17 @@ const LoginScreen = ({ onLogin }) => {
               onClick={handleHashPackLogin}
               disabled={loading}
             >
-              {loading ? 'Connecting...' : 'Connect with HashPack'}
+              {loading ? (
+                <>
+                  <FaSpinner className="spinner-icon" />
+                  Connecting...
+                </>
+              ) : (
+                <>
+                  <FaWallet />
+                  Connect with HashPack
+                </>
+              )}
             </button>
             <p className="wallet-description">
               Connect your Hedera wallet to access NFT rewards and governance features
@@ -120,43 +145,70 @@ const LoginScreen = ({ onLogin }) => {
           {/* Email/Password Auth */}
           <form onSubmit={handleEmailAuth} className="email-auth">
             {isSignUp && (
+              <div className="input-group">
+                <FaUser className="input-icon" />
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Full Name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+            )}
+            <div className="input-group">
+              <FaEnvelope className="input-icon" />
               <input
-                type="text"
-                name="name"
-                placeholder="Full Name"
-                value={formData.name}
+                type="email"
+                name="email"
+                placeholder="Email Address"
+                value={formData.email}
                 onChange={handleInputChange}
                 required
               />
-            )}
-            <input
-              type="email"
-              name="email"
-              placeholder="Email Address"
-              value={formData.email}
-              onChange={handleInputChange}
-              required
-            />
-            <input
-              type="password"
-              name="password"
-              placeholder="Password"
-              value={formData.password}
-              onChange={handleInputChange}
-              required
-            />
-            {isSignUp && (
+            </div>
+            <div className="input-group">
+              <FaLock className="input-icon" />
               <input
                 type="password"
-                name="confirmPassword"
-                placeholder="Confirm Password"
-                value={formData.confirmPassword}
+                name="password"
+                placeholder="Password"
+                value={formData.password}
                 onChange={handleInputChange}
                 required
               />
+            </div>
+            {isSignUp && (
+              <div className="input-group">
+                <FaLock className="input-icon" />
+                <input
+                  type="password"
+                  name="confirmPassword"
+                  placeholder="Confirm Password"
+                  value={formData.confirmPassword}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
             )}
             <button type="submit" disabled={loading}>
-              {loading ? 'Processing...' : (isSignUp ? 'Create Account' : 'Sign In')}
+              {loading ? (
+                <>
+                  <FaSpinner className="spinner-icon" />
+                  Processing...
+                </>
+              ) : isSignUp ? (
+                <>
+                  <FaUserPlus />
+                  Create Account
+                </>
+              ) : (
+                <>
+                  <FaSignInAlt />
+                  Sign In
+                </>
+              )}
             </button>
           </form>
         </div>

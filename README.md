@@ -1,30 +1,56 @@
-# Play Your Path (PYP)
+# Play Your Path (PYP) 🌍
 
-Play Your Path (PYP) is an African-inspired, social, play-to-earn world built on Hedera. Players start in the PYP Hub (a house-inspired home base), move between themed rooms and outdoor maps, complete courses and challenges, earn NFT badges and tokens, and participate in community governance.
+Play Your Path (PYP) is a decentralized African-inspired social gaming world built on Hedera. It blends learning, gaming, community, and rewards into one immersive experience. Users begin in The House, a symbolic hub where they explore different rooms, interact with AI, earn rewards, and teleport ("juju portals") to other worlds.
 
-Built for the Hedera Hackathon across these tracks:
+PYP is more than a game — it's a proof-of-game platform, tracking user activities, rewarding progress with NFTs & tokens, and building a blockchain reputation.
 
-- Play-to-Earn Gaming: Complete quizzes and mini-games to earn tokens and NFT badges
-- African Metaverse Worlds: Explore culturally-inspired rooms, villages, festivals, and arenas
-- Digital Collectibles & NFTs: Collect, trade, and showcase African art and cultural badges
-- Gamified Community Governance: Vote in the Council Room; create meme coins and reward systems
+## 🕹️ Core Features
 
-## Demo Summary
+### 1. The House (Main Hub)
+**Rooms = Activities:**
+- **📖 Study Room**: Take quizzes, complete courses → earn NFTs
+- **🛋️ Work Bench/Table**: Simulate working → generate meme tokens, collectibles, NFTs
+- **🐟 Aquarium (Fish Oracle)**: AI-powered fish that answers questions, analyzes your wallet, gives insights, assigns tasks, and distributes rewards
+- **🌱 Garden/Weed Planting**: Plant daily → earn token rewards (daily engagement loop)
+- **🛍️ Marketplace**: Trade NFTs and meme tokens
+- **🗳️ Council Room**: Participate in governance via tokens
 
-- PYP Hub (home) loads inside the app and acts as the starting point
-- Mode overlay: Learn, Play, Trade, Govern, Teleport
-- External areas: Village Square, Festival Grounds, Arena (with return portals)
-- Wallet and Simple Auth: HashPack login or email/password
-- Hedera actions: Create account, mint NFT badge (stub UI + live SDK), token services
-- Supabase: Profiles + Hedera account storage, balance refresh
+### 2. Social & Community
+- Friend system to connect with others
+- Shared spaces for interaction, chats, and events
+- Mini-games and challenges for community bonding
 
-## Core Features
+### 3. AI Integration
+The Fish Oracle acts as an in-game mentor:
+- Wallet analysis
+- Learning assistance
+- Task generation
+- Reward distribution
 
-- Learn (Study Room): Quizzes/courses award NFT badges (Hedera NFTs)
-- Play (Challenge Room): Puzzles and mini-games with token rewards
-- Trade (Marketplace Room): NFTs/collectibles, art drops, future market integrations
-- Govern (Council Room): Token-based proposals and voting UX
-- Teleport (Juju Portal): Move from PYP Hub to external maps (Village, Festival, Arena)
+### 4. Proof of Game & Reputation
+- Every action (planting, learning, quizzes, meme creation, working, invasions) is tracked
+- Progress builds a reputation system (blockchain-based)
+- Rewards include NFTs, tokens, and increased security tiers for your house
+
+### 5. Gameplay & Strategy
+- Invade other players' houses (tier-based system)
+- Higher-tier players can interact with lower-tier houses (check progress, compete, challenge)
+- Upgrade your house's security by minting more
+
+## 🎮 Demo Summary
+
+- **PYP Hub (The House)**: Central hub with interactive rooms
+- **Mode Overlay**: Learn, Play, Trade, Govern, Teleport
+- **External Worlds**:
+  - Village Square (community events)
+  - Festival Grounds (seasonal events)
+  - Arena (player vs player challenges)
+- **Wallet Integration**: HashPack login with Hedera token support
+- **AI Companion**: Fish Oracle for guidance and rewards
+- **Blockchain Features**:
+  - NFT badge minting
+  - Token rewards system
+  - On-chain reputation tracking
 
 ## Architecture
 
@@ -91,13 +117,41 @@ npm start
 - Use the overlay to choose Learn/Play/Trade/Govern or Teleport
 - Earn badges/tokens (demo flows)
 
-## Roadmap (Post-hackathon)
+## Roadmap
 
-- Replace stubs with full backend flows for quizzes/games and on-chain badge mints
-- Persist token/NFT collections in Supabase for each community/guild
-- Friend invites to PYP Hub (multi-user session syncing)
-- “Consult the fish” AI guide: in-game assistant for quests and lore
-- Meme coin creation and liquidity sandbox; “kolo” savings and staking flows
+### Hackathon MVP (25 days)
+- [.] Functional House with 3-4 active rooms
+- [x] Hedera wallet login + NFT minting for quizzes
+- [x] Daily rewards via planting system
+- [x] Fish Oracle with AI (basic Q&A + task issuing)
+- [x] Simple Proof of Game tracking
+
+### Next Steps (Post-hackathon)
+- **World Expansion**:
+  - Add Arena for PvP challenges
+  - Create Festival Grounds for community events
+  - Develop more interactive village spaces
+- **Gameplay**:
+  - Player invasions & tiered security system
+  - Advanced AI features for personalized quests
+  - Voice/video chat for community events
+- **Economy**:
+  - Full NFT marketplace integration
+  - Meme token creation tools
+  - DeFi features for staking and yield farming
+
+## Why This Matters
+
+- **African Identity**: inspired by cultural symbolism (juju portals, village interactions, communal play)
+- **Education + Play**: Learn Web3 and real-world skills through gamified quests
+- **Community Economy**: Meme tokens, NFT trading, governance — all user-driven
+- **AI x Blockchain**: A fun and practical bridge between intelligence and decentralized ownership
+
+## Vision
+
+Africa is one of the fastest-growing adopters of Web3. Play Your Path reimagines how learning, gaming, and community can blend in a culturally rooted, blockchain-powered environment.
+
+PYP creates a world where every action counts, every player owns their path, and every community thrives together.
 
 ## Credits and Licensing
 

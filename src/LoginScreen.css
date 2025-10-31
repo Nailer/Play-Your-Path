@@ -74,6 +74,15 @@
   border-radius: 8px;
   margin-bottom: 20px;
   font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.error-icon {
+  color: #ff6b6b;
+  font-size: 1rem;
+  flex-shrink: 0;
 }
 
 .auth-methods {
@@ -98,6 +107,19 @@
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.spinner-icon {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 .hashpack-btn:hover:not(:disabled) {
@@ -146,14 +168,29 @@
   gap: 15px;
 }
 
+.input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 16px;
+  color: #aaa;
+  font-size: 1rem;
+  z-index: 1;
+}
+
 .email-auth input {
-  padding: 14px 16px;
+  padding: 14px 16px 14px 48px;
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.1);
   color: white;
   font-size: 1rem;
   transition: all 0.3s ease;
+  width: 100%;
 }
 
 .email-auth input::placeholder {
@@ -177,6 +214,10 @@
   cursor: pointer;
   transition: all 0.3s ease;
   margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .email-auth button:hover:not(:disabled) {

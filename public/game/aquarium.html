@@ -93,6 +93,21 @@
 				if(!q) return;
 				inputEl.value = '';
 				askOracle(q);
+				
+				// Check if this is a quest-related question and assign quest
+				if(q.toLowerCase().includes('quest') || q.toLowerCase().includes('task') || q.toLowerCase().includes('challenge')){
+					// Assign a daily quest
+					if(window.PYP && window.PYP.assignQuest){
+						window.PYP.assignQuest('FISH_DAILY_1');
+					}
+				}
+				
+				// Demo: Auto-complete quest after asking about it
+				if(q.toLowerCase().includes('complete') || q.toLowerCase().includes('done')){
+					if(window.PYP && window.PYP.completeQuest){
+						window.PYP.completeQuest('FISH_DAILY_1');
+					}
+				}
 			});
 		})();
 		</script>
