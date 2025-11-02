@@ -1,6 +1,5 @@
 import { hederaService } from './hederaService';
 import { mintTalisman } from '../lib/supabase';
-import WalletService from './walletService';
 import { getHashConnect } from '../utils/hashconnect';
 
 /**
@@ -198,7 +197,6 @@ export class TalismanMintService {
 
       // Transfer NFT from treasury to user
       // The mint goes to treasury, so we need to transfer it
-      let transferReceipt = null;
       let transferTxId = null;
       try {
         console.log(`Transferring NFT from treasury to user account ${accountToUse}...`);
@@ -209,7 +207,6 @@ export class TalismanMintService {
           toAccountId: accountToUse,
           nftSerial: serialNumber
         });
-        transferReceipt = transferResult;
         transferTxId = transferResult.transactionId;
         console.log(`✅ NFT transfer transaction completed!`);
         console.log(`   Transaction ID: ${transferTxId}`);

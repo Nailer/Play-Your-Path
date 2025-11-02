@@ -86,6 +86,33 @@ Directory highlights:
 - `src/HederaAccountSetup.js`: guided flow to create testnet accounts
 - `public/game/*.html`: original The House scenes, rethemed as PYP Hub + maps
 
+## Technology Stack
+
+### Frontend
+- **React 19.1.1** - UI framework
+- **React Router 7.9.2** - Client-side routing
+- **React Icons 5.5.0** - Icon library
+- **CSS3** - Styling and animations
+
+### Blockchain & Web3
+- **Hedera SDK 2.75.0** - Hedera Hashgraph integration
+- **HashConnect 3.0.13** - HashPack wallet integration
+- **Hedera Token Service (HTS)** - Token and NFT creation
+- **Hedera Consensus Service (HCS)** - Proof-of-Game logging
+
+### Backend & Database
+- **Supabase** - PostgreSQL database and authentication
+- **Express.js** - API server (if needed)
+
+### Infrastructure
+- **IPFS (Pinata)** - Decentralized storage for NFT metadata and images
+- **Hedera Mirror Node API** - Blockchain data queries
+
+### Development Tools
+- **Node.js** - Runtime environment
+- **npm** - Package management
+- **React Scripts** - Build tooling
+
 ## Hedera Integrations (Testnet)
 
 - Create Hedera Account (funded with 20 HBAR from operator)
@@ -100,7 +127,128 @@ REACT_APP_HEDERA_OPERATOR_ID=0.0.xxxxxx
 REACT_APP_HEDERA_OPERATOR_KEY=302e02...
 REACT_APP_SUPABASE_URL=https://your-project.supabase.co
 REACT_APP_SUPABASE_ANON_KEY=your-anon-key
+REACT_APP_WALLETCONNECT_PROJECT_ID=your-walletconnect-project-id
+REACT_APP_PINATA_JWT_TOKEN=your-pinata-jwt-token (optional, for IPFS)
 ```
+
+## Deployed Contracts & Tokens
+
+### Plant Reward Token (Fungible Token)
+
+The PYP Plant Token is used for daily rewards and in-game rewards.
+
+**Token Details:**
+- **Name**: PYP Plant Token
+- **Symbol**: PYP
+- **Type**: Fungible Token (HTS)
+- **Decimals**: 0
+- **Supply Type**: Infinite
+- **Token ID**: `0.0.XXXXXX` *(Update with actual deployed token ID)*
+- **HashScan**: [View on HashScan](https://hashscan.io/testnet/token/0.0.XXXXXX) *(Update with actual token ID)*
+
+**Configuration:**
+- Used for daily planting rewards
+- Mintable by operator account
+- Transferred to users as rewards
+
+**To Find Your Token ID:**
+1. Check your Supabase `hts_config` table: `SELECT reward_token_id FROM hts_config WHERE id = 1;`
+2. Or check the output from `npm run create:plant` script
+3. View in HashPack wallet after deployment
+
+---
+
+### Talisman NFT Collections
+
+Talismans are special NFT collectibles that provide in-game perks and bonuses.
+
+#### 1. 🏠 Home Defender (Rare)
+- **Collection ID**: `0.0.XXXXXX` *(Update with actual token ID)*
+- **Symbol**: HOMEDEF
+- **Rarity**: Rare
+- **Perk**: +50 defense, 24h cooldown protection
+- **HashScan**: [View Collection](https://hashscan.io/testnet/token/0.0.XXXXXX) *(Update with actual token ID)*
+
+#### 2. 🧠 Scholar (Common)
+- **Collection ID**: `0.0.XXXXXX` *(Update with actual token ID)*
+- **Symbol**: SCHOLAR
+- **Rarity**: Common
+- **Perk**: +25% XP bonus, 10% course discount
+- **HashScan**: [View Collection](https://hashscan.io/testnet/token/0.0.XXXXXX) *(Update with actual token ID)*
+
+#### 3. 🌿 Daily Planter (Epic)
+- **Collection ID**: `0.0.XXXXXX` *(Update with actual token ID)*
+- **Symbol**: PLANTER
+- **Rarity**: Epic
+- **Perk**: +2% bonus for 7-day streaks
+- **HashScan**: [View Collection](https://hashscan.io/testnet/token/0.0.XXXXXX) *(Update with actual token ID)*
+
+#### 4. 🍀 Lucky Charm (Legendary)
+- **Collection ID**: `0.0.XXXXXX` *(Update with actual token ID)*
+- **Symbol**: LUCKY
+- **Rarity**: Legendary
+- **Perk**: +15% drop rate, +1 rarity boost
+- **HashScan**: [View Collection](https://hashscan.io/testnet/token/0.0.XXXXXX) *(Update with actual token ID)*
+
+#### 5. ⚡ Speed Demon (Rare)
+- **Collection ID**: `0.0.XXXXXX` *(Update with actual token ID)*
+- **Symbol**: SPEED
+- **Rarity**: Rare
+- **Perk**: 30% cooldown reduction, +20 energy
+- **HashScan**: [View Collection](https://hashscan.io/testnet/token/0.0.XXXXXX) *(Update with actual token ID)*
+
+#### 6. 👼 Guardian Angel (Epic)
+- **Collection ID**: `0.0.XXXXXX` *(Update with actual token ID)*
+- **Symbol**: GUARDIAN
+- **Rarity**: Epic
+- **Perk**: +40% healing, 60min protection
+- **HashScan**: [View Collection](https://hashscan.io/testnet/token/0.0.XXXXXX) *(Update with actual token ID)*
+
+### Finding Deployed Token IDs
+
+**Method 1: From Deployment Scripts**
+```bash
+# Deploy talisman collections and check output
+npm run deploy:talismans
+
+# Deploy plant token and check output
+npm run create:plant
+```
+
+**Method 2: From Supabase Database**
+```sql
+-- Get Plant Token ID
+SELECT reward_token_id FROM hts_config WHERE id = 1;
+
+-- Get Talisman Collection IDs
+SELECT perk_type, name, nft_collection_id 
+FROM talisman_collections 
+ORDER BY perk_type;
+```
+
+**Method 3: From HashScan**
+1. Visit [HashScan Testnet](https://hashscan.io/testnet)
+2. Enter your operator account ID
+3. View "Tokens" tab to see all created tokens
+4. Click on each token to view details and copy Token ID
+
+### Deployment Commands
+
+```bash
+# Deploy Plant Token
+npm run create:plant
+
+# Deploy All Talisman Collections
+npm run deploy:talismans
+
+# Mint a Talisman to User
+npm run mint:talisman COLLECTION_ID USER_ACCOUNT_ID
+
+# Award Talisman for Achievement
+npm run award:talisman daily_planter USER_ACCOUNT_ID "7 Day Streak"
+```
+
+See [TALISMAN_DEPLOYMENT_GUIDE.md](./TALISMAN_DEPLOYMENT_GUIDE.md) for detailed deployment instructions.
 
 ## Supabase Schema
 

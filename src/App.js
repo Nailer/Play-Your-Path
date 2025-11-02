@@ -25,11 +25,13 @@ function App() {
     }
   }, []);
 
-  const handleLogin = async (userData) => {
-    setUser(userData);
-    setIsAuthenticated(true);
-    localStorage.setItem("pyp-auth", JSON.stringify({ user: userData }));
-  };
+  // handleLogin can be used if AuthPage needs to pass user data up
+  // Currently AuthPage handles its own state
+  // const handleLogin = async (userData) => {
+  //   setUser(userData);
+  //   setIsAuthenticated(true);
+  //   localStorage.setItem("pyp-auth", JSON.stringify({ user: userData }));
+  // };
 
   const handleLogout = () => {
     setUser(null);

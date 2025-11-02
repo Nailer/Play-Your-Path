@@ -29,7 +29,7 @@ export class TalismanService {
 
     const config = activeTalisman.talisman_collections.perk_config;
     const streakBonus = config.streak_bonus || 2;
-    const requiredStreak = config.required_streak || 7;
+    // const requiredStreak = config.required_streak || 7; // Reserved for future streak validation
     
     // Check if user has the required streak (simplified - you'd check actual streak data)
     const hasStreak = true; // TODO: Implement actual streak checking

@@ -138,22 +138,16 @@ export class AuthService {
   }
 
   // Sign out
+  // eslint-disable-next-line no-unreachable
   static async signOut() {
-    try {
-      // In production, you'd use: await supabase.auth.signOut()
-      return { error: null };
-    } catch (error) {
-      return { error };
-    }
+    // In production, you'd use: await supabase.auth.signOut()
+    return { error: null };
   }
 
   // Get current user
+  // eslint-disable-next-line no-unreachable
   static async getCurrentUser() {
-    try {
-      // In production, you'd use: const { data: { user } } = await supabase.auth.getUser()
-      return { data: { user: null }, error: null };
-    } catch (error) {
-      return { data: { user: null }, error };
-    }
+    // In production, you'd use: const { data: { user } } = await supabase.auth.getUser()
+    return { data: { user: null }, error: null };
   }
 }

@@ -5,7 +5,6 @@ import { createSummon, getSummonByCode, acceptSummon, assignQuest, completeQuest
 import { claimDailyReward } from './services/dailyRewardService';
 import { hederaService } from './services/hederaService';
 import TalismanCollection from './components/TalismanCollection';
-import { AuthPage } from "./AuthPage.js";
 
 export default function GameFrame() {
   const iframeRef = useRef(null);
@@ -25,10 +24,9 @@ export default function GameFrame() {
               // Get current user from localStorage
               const auth = JSON.parse(localStorage.getItem('pyp-auth') || '{}');
               if (!auth.user?.profileId) {
-                // Demo mode: create fake user
-                if (iframeRef.current?.contentWindow?.PYP?.demoMode) {
-                  const demoUser = { profileId: 'demo-user-123', name: 'Demo Player' };
-                  const summon = { invite_code: 'DEMO123' };
+              // Demo mode: create fake user
+              if (iframeRef.current?.contentWindow?.PYP?.demoMode) {
+                const summon = { invite_code: 'DEMO123' };
                   navigator.clipboard.writeText(summon.invite_code);
                   if (iframeRef.current?.contentWindow?.PYP?.showNotification) {
                     iframeRef.current.contentWindow.PYP.showNotification(`Demo Summon created! Code: ${summon.invite_code} (Copied to clipboard)`, 'success');
@@ -261,6 +259,11 @@ export default function GameFrame() {
               console.error('Error opening talisman collection:', error);
               alert(`Error: ${error.message}`);
             }
+            break;
+          
+          default:
+            // Unknown message type, ignore
+            console.log('Unknown message type:', type);
             break;
         }
       } catch (error) {

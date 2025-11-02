@@ -13,7 +13,6 @@ export const AuthPage = () => {
   const [user, setUser] = useState(null);
   const [showHederaSetup, setShowHederaSetup] = useState(false);
   const [showUserProfile, setShowUserProfile] = useState(false);
-  const [accountId, setAccountId] = useState(null);
 
   useEffect(() => {
     // Check for existing auth state
@@ -51,7 +50,6 @@ export const AuthPage = () => {
           hashconnect.pairingEvent.on((pairingData) => {
             if (pairingData && pairingData.accountIds && pairingData.accountIds.length > 0) {
               const accountIdStr = pairingData.accountIds[0]; // Already string in v3
-              setAccountId(accountIdStr);
               console.log("✅ Wallet connected:", accountIdStr);
             }
           });
@@ -60,7 +58,7 @@ export const AuthPage = () => {
           if (hashconnect.connectedAccountIds && hashconnect.connectedAccountIds.length > 0) {
             const existingAccountId = hashconnect.connectedAccountIds[0].toString();
             if (existingAccountId) {
-              setAccountId(existingAccountId);
+              console.log("✅ Wallet already connected:", existingAccountId);
             }
           }
         }

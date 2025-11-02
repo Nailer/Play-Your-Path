@@ -3,7 +3,6 @@ import './UserProfile.css';
 import { getUserProfile, updateHederaBalance } from '../lib/supabase';
 import { getAccountBalance } from '../services/hederaService';
 import WalletService from '../services/walletService';
-import { initHashConnect, getHashConnect } from '../utils/hashconnect';
 import { 
   FaUser, 
   FaTimes, 
@@ -14,14 +13,12 @@ import {
   FaExclamationTriangle,
   FaEnvelope,
   FaGem,
-  FaTrophy,
   FaCalendarAlt,
   FaCopy,
   FaExternalLinkAlt,
   FaPaperPlane,
   FaHistory,
   FaImage,
-  FaCheckCircle,
   FaSignInAlt,
   FaLongArrowAltRight,
   FaLayerGroup
@@ -52,6 +49,7 @@ const UserProfile = ({ user, onClose }) => {
   useEffect(() => {
     loadUserProfile();
     checkWalletConnection();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const checkWalletConnection = () => {

@@ -15,7 +15,7 @@ export async function claimDailyReward({ userProfileId, hederaAccountId }) {
   const basePoints = 10;
   const talismanBonus = await TalismanService.applyDailyPlanterPerk(userProfileId, basePoints);
   const newPoints = Number(pointsRow.points || 0) + talismanBonus.points;
-  const updated = await updateDailyPoints(userProfileId, { points: newPoints, last_claimed_date: todayStr });
+  await updateDailyPoints(userProfileId, { points: newPoints, last_claimed_date: todayStr });
 
   // Optional: also grant fungible tokens via HTS if configured in Supabase
   const hts = await getHtsConfig();

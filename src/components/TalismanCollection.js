@@ -13,8 +13,7 @@ import {
   FaSpinner,
   FaCheckCircle,
   FaExclamationTriangle,
-  FaPlus,
-  FaWallet
+  FaPlus
 } from 'react-icons/fa';
 import { 
   getUserTalismans, 
@@ -64,6 +63,7 @@ export default function TalismanCollection({ isOpen, onClose, userId }) {
     if (isOpen && userId) {
       loadTalismanData();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, userId]);
 
   const loadTalismanData = async () => {
