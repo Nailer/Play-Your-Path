@@ -10,18 +10,38 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
   const [showUserProfile, setShowUserProfile] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check for existing auth state
-    const savedAuth = localStorage.getItem("pyp-auth");
-    if (savedAuth) {
+    // Check for existing auth state synchronously to prevent flash
+    // localStorage is always available in browser context
+    const checkAuth = () => {
       try {
-        const authData = JSON.parse(savedAuth);
-        setUser(authData.user);
-        setIsAuthenticated(true);
+        const savedAuth = localStorage.getItem("pyp-auth");
+        if (savedAuth) {
+          const authData = JSON.parse(savedAuth);
+          if (authData && authData.user) {
+            setUser(authData.user);
+            setIsAuthenticated(true);
+          } else {
+            // Invalid auth data, clean it up
+            localStorage.removeItem("pyp-auth");
+          }
+        }
       } catch (e) {
+        console.error("Error parsing auth data:", e);
         localStorage.removeItem("pyp-auth");
+      } finally {
+        // Always set loading to false after check completes
+        setIsLoading(false);
       }
+    };
+
+    // Check auth immediately - localStorage is available synchronously
+    if (typeof window !== 'undefined') {
+      checkAuth();
+    } else {
+      setIsLoading(false);
     }
   }, []);
 
@@ -33,16 +53,49 @@ function App() {
   //   localStorage.setItem("pyp-auth", JSON.stringify({ user: userData }));
   // };
 
+  const handleLogin = (userData) => {
+    setUser(userData);
+    setIsAuthenticated(true);
+    localStorage.setItem("pyp-auth", JSON.stringify({ user: userData }));
+  };
+
   const handleLogout = () => {
     setUser(null);
     setIsAuthenticated(false);
     localStorage.removeItem("pyp-auth");
   };
 
+  // Show loading state while checking authentication
+  if (isLoading) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        background: '#1a1a1a',
+        color: '#fff'
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{
+            border: '4px solid rgba(255, 255, 255, 0.1)',
+            borderTop: '4px solid #4f46e5',
+            borderRadius: '50%',
+            width: '40px',
+            height: '40px',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto 20px'
+          }}></div>
+          <p>Loading Play Your Path...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <BrowserRouter>
       {!isAuthenticated ? (
-        <AuthPage />
+        <AuthPage onLogin={handleLogin} />
       ) : (
         <div className="app">
           <div className="user-bar">
