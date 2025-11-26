@@ -785,7 +785,7 @@ var game = {
             target: "18-6",
             action: function () {
               sound_door.play();
-              game.boiler_room(5, 0);
+              game.start(5, 0);
             },
           });
         });
