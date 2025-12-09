@@ -1261,6 +1261,13 @@ var game = {
 			//assign tooltips
 			$('#door_kitchen').tooltip('left');
 			$('#window').tooltip('left');
+			$('#fridge').tooltip('right');
+			$('#cupboard').tooltip('right');
+			$('#table').tooltip('right');
+			$('#chair').tooltip('right');
+			$('#kitchen_use_1').tooltip('right'); // Sink
+			$('#kitchen_use_2').tooltip('right'); // Vent
+			$('#kitchen_use_3').tooltip('right'); // Cooker - Create Token
 			
 			/* ===ITEMS=== */
 
@@ -1293,6 +1300,17 @@ var game = {
 			});
 
 			$('#kitchen_use_1, #kitchen_use_2, #kitchen_use_3').click(function() {
+				var clickedId = $(this).attr('id');
+				
+				// If kitchen_use_3 (cooker/stove) is clicked, open token creation
+				if (clickedId === 'kitchen_use_3') {
+					// Send message to parent to open token creation modal
+					if (window.parent && window.parent.postMessage) {
+						window.parent.postMessage({type:'PYP_CREATE_TOKEN'}, '*');
+					}
+					return; // Don't do the visual effect for cooker
+				}
+
 				$('#kitchen_kitchen_true').css('opacity', '.3');
 
 				var kitchen = $('#kitchen');
