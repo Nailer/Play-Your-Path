@@ -764,7 +764,7 @@ var game = {
 					target: '18-6',
 					action: function() {
 						sound_door.play();
-						game.bathroom(5,0);  
+						game.toilet(5,0);  
 					}  
 				});
 				

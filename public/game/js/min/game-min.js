@@ -192,6 +192,199 @@ var game = {
       },
     });
   },
+  room_v1: function (a, b) {
+    room.generate({
+      inject: "room",
+      grid_width: 13,
+      grid_height: 19,
+      collision_nodes: [
+        "7-9",
+        "0-14",
+        "0-15",
+        "1-15",
+        "1-14",
+        "0-4",
+        "0-5",
+        "0-6",
+        "0-7",
+        "0-8",
+        "0-9",
+        "1-4",
+        "1-5",
+        "1-6",
+        "1-7",
+        "1-8",
+        "1-9",
+        "2-4",
+        "2-5",
+        "2-6",
+        "2-7",
+        "2-8",
+        "2-9",
+        "11-7",
+        "11-8",
+        "11-9",
+        "11-10",
+        "12-7",
+        "12-8",
+        "12-9",
+        "12-10",
+        "10-1",
+      ],
+      drag_room: !0,
+      room_glow: !0,
+      player: "player",
+      player_speed: 100,
+      player_position_x: a,
+      player_position_y: b,
+      volume: 50,
+      execute: function () {
+        if ($.inArray("scene_intro", played) === -1) {
+          var a = $.jStorage.get("played");
+          a.push("scene_intro");
+          $.jStorage.set("played", a);
+          $("#player").text_cloud("Where am I?", 2e3);
+        }
+        room.transparency(
+          $("#chair"),
+          $("#6-9, #6-8, #7-8, #5-8, #5-7, #4-6, #4-7")
+        );
+        room.transparency(
+          $("#bed, #bed_mask"),
+          $("#2-3, #1-3, #0-3, #1-2, #0-2")
+        );
+        room.transparency(
+          $("#desk, #desk_mask"),
+          $(
+            "#12-6, #11-5, #11-6, #10-10, #10-9, #10-8, #10-7, #10-6, #10-5, #9-9, #9-8, #9-7, #9-6, #9-5"
+          )
+        );
+        room.transparency($("#shelf, #shelf_mask"), $("#1-13, #0-13, #0-12"));
+        room.transparency($("#plant"), $("#9-1, #9-0, #10-0"));
+        room.pulse($("#glow"), 5e3);
+        $("#window, #door_exit, #plant_check").tooltip("left");
+        $("#the_game").find("#note").tooltip("right");
+        $("#water, #picture").tooltip("right");
+        $("#bubbles").sprite({ fps: 8, no_of_frames: 8 });
+        $("#window").click(function () {
+          room.the_player.go_to.start({
+            target: "5-0",
+            action: function () {
+              view.start(
+                [
+                  ["aquarium_view", "3000", "10"],
+                  ["boiler_room_view", "5000", "4"],
+                  ["corridor_view", "4000", "8"],
+                ],
+                function () {
+                  if ($.inArray("scene_furnace", played) !== -1) {
+                    $("#corridor_view").addClass("leaves");
+                    var a = $("#boiler_room_view"),
+                      b = $('<div class="smoke one" />').appendTo(a),
+                      c = $('<div class="smoke two" />').appendTo(a),
+                      d = $('<div class="smoke tri" />').appendTo(a),
+                      e = function (a) {
+                        a.css("opacity", "1").transition(
+                          { x: -50, y: -100, scale: 3, opacity: 0 },
+                          5e3,
+                          "in-out",
+                          function () {
+                            a.transition(
+                              { x: 0, y: 0, scale: 1 },
+                              (Math.random() * 5 + 1) * 100,
+                              function () {
+                                e(a);
+                              }
+                            );
+                          }
+                        );
+                      };
+                    e(b);
+                    setTimeout(function () {
+                      e(c);
+                    }, 1e3);
+                    setTimeout(function () {
+                      e(d);
+                    }, 2e3);
+                  }
+                }
+              );
+            },
+          });
+        });
+        $("#the_game")
+          .find("#note")
+          .click(function () {
+            room.the_player.go_to.start({
+              target: "10-8",
+              action: function () {
+                items.take("#note");
+              },
+            });
+          });
+        if ($.inArray("scene_furnace", played) !== -1) {
+          $("#picture_winter").css("background", "none");
+          $("#plant").removeClass("small");
+        }
+        /////////////////////////////////////////////////////////////////////////////////
+        $("#door_exit").click(function () {
+          room.the_player.go_to.start({
+            target: "6-18",
+            action: function () {
+              if ($.inArray("key", collected) === -1) {
+                sound_door_locked.play();
+                $("#player").text_cloud("Locked!", 1e3);
+              } else if ($.inArray("key", used) === -1) {
+                items.use("#key");
+                $("#option_0").click(function () {
+                  dialogue_box.destroy();
+                  sound_door.play();
+                  game.corridor(14, 0);
+                });
+              } else {
+                sound_door.play();
+                game.corridor(14, 0);
+              }
+            },
+          });
+        });
+        $("#water").click(function () {
+          room.the_player.go_to.start({
+            target: "2-15",
+            action: function () {
+              if ($.inArray("key", collected) === -1) {
+                scene.no_click(!0);
+                room.center(!0, 2e3);
+                $(room.player_body())
+                  .css("background-position", "-310px 0")
+                  .animate({ opacity: 0 }, 2e3);
+                $("#player").text_cloud("Hedera's world is... Strange and interesting", 1500);
+                setTimeout(function () {
+                  scene.no_click(!1);
+                  sound_teleport.play();
+                  game.aquarium(20, 5);
+                }, 2e3);
+              } else {
+                sound_teleport.play();
+                game.aquarium(20, 5);
+              }
+            },
+          });
+        });
+        $("#picture").click(function () {
+          room.the_player.go_to.start({
+            target: "3-6",
+            action: function () {
+              sound_teleport.play();
+              $.inArray("scene_furnace", played) === -1
+                ? game.picture_snow(7, 8)
+                : game.picture(7, 8);
+            },
+          });
+        });
+      },
+    });
+  },
   aquarium: function (a, b) {
     room.generate({
       inject: "aquarium",
@@ -500,7 +693,7 @@ var game = {
               target: "7-8",
               action: function () {
                 sound_teleport.play();
-                game.room(3, 7);
+                game.room_v1(3, 7);
               },
             });
           });
@@ -785,7 +978,7 @@ var game = {
             target: "18-6",
             action: function () {
               sound_door.play();
-              game.start(5, 0);
+              game.room(5, 0);
             },
           });
         });
@@ -1362,6 +1555,102 @@ var game = {
   toilet: function (a, b) {
     room.generate({
       inject: "toilet",
+      grid_width: 5,
+      grid_height: 5,
+      collision_nodes: ["2-4", "2-3"],
+      drag_room: !0,
+      player: "player",
+      player_speed: 100,
+      player_position_x: a,
+      player_position_y: b,
+      volume: 150,
+      execute: function () {
+        var a = $("#door_corridor"),
+          b = $("#cord"),
+          c = $("#cord_use");
+        room.transparency($("#wc, #cord"), $("#0-3, #0-2, #1-4, #1-3, #1-2"));
+        c.tooltip("left");
+        a.tooltip("left");
+        c.click(function () {
+          room.the_player.go_to.start({
+            target: "1-3",
+            action: function () {
+              sound_creak.play();
+              b.css("top", -88);
+              $("#sprite").css("background-position", "-620px 0px");
+              setTimeout(function () {
+                b.css("top", -108);
+              }, 900);
+              setTimeout(function () {
+                sound_teleport.play();
+                game.boiler_room(8, 0);
+              }, 2e3);
+            },
+          });
+        });
+        a.click(function () {
+          room.the_player.go_to.start({
+            target: "2-0",
+            action: function () {
+              sound_door.play();
+              game.corridor(11, 6);
+            },
+          });
+        });
+      },
+    });
+  },
+  toilet_v1: function (a, b) {
+    room.generate({
+      inject: "toilet",
+      grid_width: 5,
+      grid_height: 5,
+      collision_nodes: ["2-4", "2-3"],
+      drag_room: !0,
+      player: "player",
+      player_speed: 100,
+      player_position_x: a,
+      player_position_y: b,
+      volume: 150,
+      execute: function () {
+        var a = $("#door_corridor"),
+          b = $("#cord"),
+          c = $("#cord_use");
+        room.transparency($("#wc, #cord"), $("#0-3, #0-2, #1-4, #1-3, #1-2"));
+        c.tooltip("left");
+        a.tooltip("left");
+        c.click(function () {
+          room.the_player.go_to.start({
+            target: "1-3",
+            action: function () {
+              sound_creak.play();
+              b.css("top", -88);
+              $("#sprite").css("background-position", "-620px 0px");
+              setTimeout(function () {
+                b.css("top", -108);
+              }, 900);
+              setTimeout(function () {
+                sound_teleport.play();
+                game.boiler_room(8, 0);
+              }, 2e3);
+            },
+          });
+        });
+        a.click(function () {
+          room.the_player.go_to.start({
+            target: "2-0",
+            action: function () {
+              sound_door.play();
+              game.corridor(11, 6);
+            },
+          });
+        });
+      },
+    });
+  },
+  toilet_v2: function (a, b) {
+    room.generate({
+      inject: "toilet_v2",
       grid_width: 5,
       grid_height: 5,
       collision_nodes: ["2-4", "2-3"],
