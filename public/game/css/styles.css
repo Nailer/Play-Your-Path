@@ -5236,3 +5236,326 @@ body,
   background: url(../images/resume_screen.png);
   background-position: 0 -64px;
 }
+
+#toilet_v2 {
+  position: absolute;
+  width: 373px;
+  height: 542px;
+  cursor: move;
+  background: linear-gradient(rgba(255, 0, 0, 0.4), rgba(255, 0, 0, 0.4)), url(../images/toilet.jpg) no-repeat;
+}
+#toilet_v2 #sprite {
+  background: url(../images/hidden_corridor_player.png) no-repeat 0 0;
+}
+#toilet_v2 #shadow {
+  width: 122px;
+  height: 102px;
+  background: url(../images/hidden_corridor_shadow.png) no-repeat;
+  left: -38px;
+  top: -28px;
+  opacity: .5;
+}
+#toilet_v2 #floor {
+  position: absolute;
+  right: -12px;
+  bottom: 37px;
+  width: 373px;
+  height: 209px;
+}
+#toilet_v2 #dim {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 998;
+  width: 373px;
+  height: 542px;
+  background: url(../images/toilet_overlay.png) no-repeat;
+  opacity: .6;
+}
+#toilet_v2 #wc {
+  width: 99px;
+  height: 282px;
+  position: absolute;
+  left: 49px;
+  top: -117px;
+  z-index: 18;
+  background:  url(../images/toilet_wc.png)  no-repeat right;
+}
+#toilet_v2 #cord {
+  width: 6px;
+  height: 116px;
+  position: absolute;
+  left: 53px;
+  top: -108px;
+  z-index: 18;
+  background:  url(../images/toilet_cord.png)  no-repeat right;
+  -moz-transition: all 0.6s ease-out;
+  -webkit-transition: all 0.6s ease-out;
+  -o-transition: all 0.6s ease-out;
+  -ms-transition: all 0.6s ease-out;
+  transition: all 0.6s ease-out;
+}
+#toilet_v2 #door_corridor {
+  -moz-transform-origin: top left;
+  -webkit-transform-origin: top left;
+  -o-transform-origin: top left;
+  -ms-transform-origin: top left;
+  transform-origin: top left;
+  -moz-transform: rotate(30deg) skew(30deg) scaley(0.866);
+  -webkit-transform: rotate(30deg) skew(30deg) scaley(0.866);
+  -o-transform: rotate(30deg) skew(30deg) scaley(0.866);
+  -ms-transform: rotate(30deg) skew(30deg) scaley(0.866);
+  transform: rotate(30deg) skew(30deg) scaley(0.866);
+  width: 124px;
+  height: 234px;
+  position: absolute;
+  top: 75px;
+  left: 221px;
+  z-index: 2000;
+  cursor: pointer;
+}
+#toilet_v2 #cord_use {
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  top: 287px;
+  left: 59px;
+  z-index: 2000;
+  border-radius: 100%;
+  cursor: pointer;
+}
+
+#room_v1 {
+  position: absolute;
+  width: 1136px;
+  height: 951px;
+  cursor: move;
+  background: linear-gradient(rgba(0, 128, 0, 0.4), rgba(0, 128, 0, 0.4)), url(../images/room.jpg) no-repeat;
+  /* ITEMS */
+}
+#room_v1 #sprite {
+  background: url(../images/room_player.png) no-repeat 0 0;
+}
+#room_v1 #shadow {
+  width: 198px;
+  height: 144px;
+  background: url(../images/room_shadow.png) no-repeat;
+  left: -126px;
+  top: -27px;
+}
+#room_v1 #door_exit {
+  width: 174px;
+  height: 111px;
+  position: absolute;
+  left: 117px;
+  top: 775px;
+  z-index: 998;
+  cursor: pointer;
+  background: url(../images/doors.png) no-repeat 0 0;
+}
+#room_v1 #floor {
+  width: 1108px;
+  height: 640px;
+  position: absolute;
+  right: 15px;
+  bottom: 15px;
+}
+#room_v1 #glow {
+  width: 587px;
+  height: 562px;
+  position: absolute;
+  left: 427px;
+  top: -194px;
+  z-index: 999;
+  background: url(../images/room_glow.png) no-repeat;
+}
+#room_v1 #chair {
+  width: 71px;
+  height: 160px;
+  position: absolute;
+  left: 555px;
+  top: 200px;
+  z-index: 149;
+  background:  url(../images/room_chair.png)  no-repeat right;
+}
+#room_v1 #desk {
+  width: 139px;
+  height: 201px;
+  position: absolute;
+  left: 727px;
+  top: 280px;
+  z-index: 242;
+  background:  url(../images/room_desk.png)  no-repeat right;
+}
+#room_v1 #desk_mask {
+  width: 69px;
+  height: 201px;
+  position: absolute;
+  left: 658px;
+  top: 280px;
+  z-index: 229;
+  background:  url(../images/room_desk.png)  no-repeat;
+}
+#room_v1 #note {
+  cursor: pointer;
+  width: 58px;
+  height: 34px;
+  position: absolute;
+  left: 709px;
+  top: 333px;
+  z-index: 2000;
+  background:  url(../images/room_note.png)  no-repeat right;
+}
+#room_v1 #plant {
+  width: 122px;
+  height: 126px;
+  position: absolute;
+  left: 901px;
+  top: 149px;
+  z-index: 192;
+  background:  url(../images/room_plant.png)  no-repeat right;
+}
+#room_v1 #plant.small {
+  background: url(../images/room_plant_small.png) no-repeat right;
+}
+#room_v1 #plant_check {
+  -moz-transform-origin: top left;
+  -webkit-transform-origin: top left;
+  -o-transform-origin: top left;
+  -ms-transform-origin: top left;
+  transform-origin: top left;
+  -moz-transform: rotate(-30deg) skew(30deg) scaley(0.866);
+  -webkit-transform: rotate(-30deg) skew(30deg) scaley(0.866);
+  -o-transform: rotate(-30deg) skew(30deg) scaley(0.866);
+  -ms-transform: rotate(-30deg) skew(30deg) scaley(0.866);
+  transform: rotate(-30deg) skew(30deg) scaley(0.866);
+  width: 60px;
+  height: 60px;
+  border-radius: 60px;
+  position: absolute;
+  left: 932px;
+  top: 504px;
+  z-index: 2000;
+  cursor: help;
+}
+#room_v1 #aquarium {
+  width: 57px;
+  height: 93px;
+  position: absolute;
+  left: 177px;
+  top: 183px;
+  z-index: 47;
+  background:  url(../images/room_aquarium.png)  no-repeat right;
+}
+#room_v1 #bubbles {
+  width: 57px;
+  height: 93px;
+  position: absolute;
+  left: 177px;
+  top: 183px;
+  z-index: 47;
+  background: url(../images/room_bubbles.png);
+  opacity: .3;
+}
+#room_v1 #shelf {
+  width: 69px;
+  height: 314px;
+  position: absolute;
+  left: 172px;
+  top: 46px;
+  z-index: 47;
+  background:  url(../images/room_shelf.png)  no-repeat right;
+}
+#room_v1 #shelf_mask {
+  width: 69px;
+  height: 314px;
+  position: absolute;
+  left: 103px;
+  top: 46px;
+  z-index: 30;
+  background:  url(../images/room_shelf.png)  no-repeat;
+}
+#room_v1 #bed {
+  width: 245px;
+  height: 241px;
+  position: absolute;
+  left: 380px;
+  top: 20px;
+  z-index: 46;
+  background:  url(../images/room_bed.png)  no-repeat right;
+}
+#room_v1 #bed_mask {
+  width: 69px;
+  height: 241px;
+  position: absolute;
+  left: 311px;
+  top: 20px;
+  z-index: 18;
+  background:  url(../images/room_bed.png)  no-repeat;
+}
+#room_v1 #window {
+  -moz-transform-origin: top left;
+  -webkit-transform-origin: top left;
+  -o-transform-origin: top left;
+  -ms-transform-origin: top left;
+  transform-origin: top left;
+  -moz-transform: rotate(30deg) skew(30deg) scaley(0.866);
+  -webkit-transform: rotate(30deg) skew(30deg) scaley(0.866);
+  -o-transform: rotate(30deg) skew(30deg) scaley(0.866);
+  -ms-transform: rotate(30deg) skew(30deg) scaley(0.866);
+  transform: rotate(30deg) skew(30deg) scaley(0.866);
+  width: 183px;
+  height: 131px;
+  position: absolute;
+  left: 825px;
+  top: 145px;
+  z-index: 2000;
+  cursor: pointer;
+}
+#room_v1 #picture,
+#room_v1 #picture_winter {
+  -moz-transform-origin: top left;
+  -webkit-transform-origin: top left;
+  -o-transform-origin: top left;
+  -ms-transform-origin: top left;
+  transform-origin: top left;
+  -moz-transform: rotate(-30deg) skew(-30deg) scaley(0.866);
+  -webkit-transform: rotate(-30deg) skew(-30deg) scaley(0.866);
+  -o-transform: rotate(-30deg) skew(-30deg) scaley(0.866);
+  -ms-transform: rotate(-30deg) skew(-30deg) scaley(0.866);
+  transform: rotate(-30deg) skew(-30deg) scaley(0.866);
+  width: 147px;
+  height: 122px;
+  position: absolute;
+  top: 554px;
+  left: 332px;
+  z-index: 2000;
+  cursor: pointer;
+}
+#room_v1 #picture {
+  background: url(../images/room_picture.png) no-repeat right;
+}
+#room_v1 #picture_winter {
+  background: url(../images/room_picture_winter.png) no-repeat right;
+  z-index: 2001;
+  pointer-events: none;
+}
+#room_v1 #water {
+  -moz-transform-origin: top left;
+  -webkit-transform-origin: top left;
+  -o-transform-origin: top left;
+  -ms-transform-origin: top left;
+  transform-origin: top left;
+  -moz-transform: rotate(30deg) skew(30deg) scaley(0.866);
+  -webkit-transform: rotate(30deg) skew(30deg) scaley(0.866);
+  -o-transform: rotate(30deg) skew(30deg) scaley(0.866);
+  -ms-transform: rotate(30deg) skew(30deg) scaley(0.866);
+  transform: rotate(30deg) skew(30deg) scaley(0.866);
+  width: 60px;
+  height: 80px;
+  position: absolute;
+  left: 176px;
+  top: 191px;
+  z-index: 2000;
+  cursor: help;
+}
