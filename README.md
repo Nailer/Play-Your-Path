@@ -314,6 +314,97 @@ npm start
 - **Community Economy**: Meme tokens, NFT trading, governance — all user-driven
 - **AI x Blockchain**: A fun and practical bridge between intelligence and decentralized ownership
 
+## 🎮 Getting Started with PYP (Play Your Path)
+
+Welcome to **PYP**, an interactive on-chain learning game powered by **Hedera**. Follow the steps below to get started, explore the game world, and maximize your rewards.
+
+---
+
+## 🔐 Step 1: Create Your Account
+1. Visit the PYP website and **sign up using your email address**.
+2. After signing in, click the **profile icon** located at the top-right corner.
+3. A modal will appear prompting you to **create your account**.
+4. Once completed, your profile will display:
+   - 📧 Email address  
+   - 🆔 Account ID  
+   - 🔗 EVM address  
+   - 🌐 Hedera-linked wallet details  
+
+> 💡 This account represents your **on-chain identity** within PYP.
+
+---
+
+## 🚀 Step 2: Enter the Game World
+1. Navigate to the **PYP** page from the main menu.
+2. You will be taken directly into the game.
+3. An **introductory walkthrough** explains what to expect.
+4. After the introduction, your character spawns inside your **first room**.
+
+---
+
+## 🪟 Step 3: Explore Your First Room
+1. Hover your cursor over the **window** in the room to view contextual information.
+2. Click the window to access a **course page**.
+3. Review or begin the course.
+4. Click the **Cancel** button at the top-right corner to return to the room.
+
+---
+
+## 🖼️ Step 4: Begin Your First Quest
+1. Click the **picture on the left side** of the room.
+2. You will be instructed to collect a **stick on the floor**.
+3. Hover over the stick, then click it to pick it up.
+4. Follow the on-screen instructions to continue the quest.
+
+---
+
+## 👛 Step 5: Set Up Your Wallet (HashPack)
+1. During the quest, you will be prompted to download the **HashPack wallet**.
+2. Complete the wallet setup as instructed.
+3. Once finished, you will be redirected back to the room.
+
+> 🔐 The wallet enables **rewards, progression, and on-chain interactions** within PYP.
+
+---
+
+## 🌱 Step 6: Claim Your Daily Rewards
+1. Locate the **plant** inside the room.
+2. Click the plant to claim your **daily rewards**.
+
+> ⭐ Daily rewards are essential for earning, leveling up, and unlocking features in the game.
+
+---
+
+## 📄 Step 7: Learn About Hedera
+1. Click the **paper on the table**.
+2. This section provides an overview of **Hedera**, the blockchain powering PYP.
+
+---
+
+## 🐠 Step 8: Meet the Fish Oracle
+1. Click the **water (aquarium)** in the room.
+2. This introduces the **Fish Oracle**, an AI-powered guide.
+3. The Fish Oracle helps with:
+   - 🧠 Guidance and explanations  
+   - 📋 Task instructions  
+   - 📊 Progress tracking  
+   - 🎁 Reward insights  
+
+---
+
+## ✅ You’re All Set!
+By completing these steps, you have:
+- Created your on-chain identity  
+- Entered the PYP game world  
+- Completed your first quest  
+- Set up your wallet  
+- Claimed daily rewards  
+- Learned about Hedera  
+- Met your AI guide  
+
+🎉 You’re now ready to **explore, learn, and earn** in PYP.
+
+
 ## Vision
 
 Africa is one of the fastest-growing adopters of Web3. Play Your Path reimagines how learning, gaming, and community can blend in a culturally rooted, blockchain-powered environment.
