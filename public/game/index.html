@@ -546,7 +546,288 @@ window.PYP.completeQuest = function(questCode){
 			});
 		})();
 
-		// No welcome popups to keep UI clean during demo
+		// Getting Started Instructions Modal - Gamified Version
+		(function setupGettingStartedModal(){
+			var modal = document.createElement('div');
+			modal.id = 'pyp-getting-started-modal';
+			modal.style.cssText = `
+				position: fixed;
+				top: 0; left: 0; right: 0; bottom: 0;
+				background: rgba(10, 10, 15, 0.95);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				z-index: 20005;
+				backdrop-filter: blur(8px);
+				opacity: 0;
+				transition: opacity 0.5s ease;
+			`;
+			
+			// Inject styles and keyframes
+			if (!document.getElementById('pyp-gamified-styles')) {
+				var style = document.createElement('style');
+				style.id = 'pyp-gamified-styles';
+				style.textContent = `
+					@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700&display=swap');
+					
+					.pyp-card-grid {
+						display: grid;
+						grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+						gap: 20px;
+						padding: 10px;
+					}
+
+					.pyp-step-card {
+						background: rgba(30, 41, 59, 0.7);
+						border: 1px solid rgba(56, 189, 248, 0.2);
+						border-radius: 16px;
+						padding: 20px;
+						position: relative;
+						overflow: hidden;
+						transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+						cursor: default;
+						backdrop-filter: blur(10px);
+						box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+					}
+
+					.pyp-step-card:hover {
+						transform: translateY(-5px) scale(1.02);
+						border-color: rgba(56, 189, 248, 0.8);
+						box-shadow: 0 0 20px rgba(56, 189, 248, 0.3), inset 0 0 10px rgba(56, 189, 248, 0.1);
+						background: rgba(30, 41, 59, 0.9);
+					}
+
+					.pyp-step-card::before {
+						content: '';
+						position: absolute;
+						top: 0; left: 0; width: 100%; height: 4px;
+						background: linear-gradient(90deg, transparent, #38bdf8, transparent);
+						opacity: 0;
+						transition: opacity 0.3s;
+					}
+
+					.pyp-step-card:hover::before {
+						opacity: 1;
+					}
+
+					.pyp-step-icon {
+						font-size: 32px;
+						background: rgba(56, 189, 248, 0.1);
+						width: 60px; height: 60px;
+						border-radius: 50%;
+						display: flex;
+						align-items: center;
+						justify-content: center;
+						margin-bottom: 15px;
+						border: 2px solid rgba(56, 189, 248, 0.3);
+						transition: all 0.3s;
+					}
+
+					.pyp-step-card:hover .pyp-step-icon {
+						background: rgba(56, 189, 248, 0.2);
+						border-color: #38bdf8;
+						transform: rotateY(180deg);
+						box-shadow: 0 0 15px rgba(56, 189, 248, 0.5);
+					}
+
+					.pyp-step-number {
+						position: absolute;
+						top: 15px; right: 15px;
+						font-family: 'Orbitron', sans-serif;
+						font-size: 40px;
+						font-weight: 900;
+						color: rgba(255, 255, 255, 0.05);
+						line-height: 1;
+						transition: color 0.3s;
+					}
+
+					.pyp-step-card:hover .pyp-step-number {
+						color: rgba(56, 189, 248, 0.2);
+					}
+
+					.pyp-play-btn {
+						background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+						color: white;
+						border: none;
+						padding: 16px 60px;
+						border-radius: 30px;
+						font-family: 'Orbitron', sans-serif;
+						font-size: 18px;
+						font-weight: bold;
+						cursor: pointer;
+						box-shadow: 0 0 20px rgba(37, 99, 235, 0.5);
+						transition: all 0.3s;
+						text-transform: uppercase;
+						letter-spacing: 2px;
+						position: relative;
+						overflow: hidden;
+					}
+
+					.pyp-play-btn:hover {
+						transform: scale(1.05);
+						box-shadow: 0 0 40px rgba(37, 99, 235, 0.8);
+						filter: brightness(1.2);
+					}
+
+					.pyp-play-btn::after {
+						content: '';
+						position: absolute;
+						top: -50%; left: -50%; width: 200%; height: 200%;
+						background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 60%);
+						transform: scale(0);
+						transition: transform 0.3s;
+					}
+
+					.pyp-play-btn:active::after {
+						transform: scale(1);
+						transition: 0s;
+					}
+
+					.pyp-modal-close {
+						position: absolute;
+						top: 20px; right: 20px;
+						width: 40px; height: 40px;
+						background: rgba(255, 255, 255, 0.1);
+						border-radius: 50%;
+						display: flex;
+						align-items: center;
+						justify-content: center;
+						cursor: pointer;
+						transition: all 0.3s;
+						z-index: 100;
+						border: 1px solid rgba(255,255,255,0.1);
+					}
+
+					.pyp-modal-close:hover {
+						background: rgba(239, 68, 68, 0.2);
+						border-color: rgba(239, 68, 68, 0.8);
+						transform: rotate(90deg);
+					}
+
+					/* Custom Scrollbar */
+					.pyp-scroll::-webkit-scrollbar { width: 8px; }
+					.pyp-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); border-radius: 4px; }
+					.pyp-scroll::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
+					.pyp-scroll::-webkit-scrollbar-thumb:hover { background: #4b5563; }
+
+					@keyframes slideUpFade {
+						0% { opacity: 0; transform: translateY(30px); }
+						100% { opacity: 1; transform: translateY(0); }
+					}
+				`;
+				document.head.appendChild(style);
+			}
+
+			// Main Container
+			var container = document.createElement('div');
+			container.style.cssText = `
+				width: 95%; max-width: 1200px; height: 90vh;
+				background: linear-gradient(180deg, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.98) 100%);
+				border-radius: 24px;
+				border: 1px solid rgba(255, 255, 255, 0.1);
+				box-shadow: 0 0 50px rgba(0,0,0,0.5), inset 0 0 100px rgba(0,0,0,0.2);
+				display: flex; flex-direction: column;
+				position: relative;
+				overflow: hidden;
+				animation: slideUpFade 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+			`;
+
+			// Background ambience
+			var ambience = document.createElement('div');
+			ambience.style.cssText = `
+				position: absolute; top:0; left:0; width:100%; height:100%;
+				background: 
+					radial-gradient(circle at 10% 20%, rgba(56, 189, 248, 0.15) 0%, transparent 40%),
+					radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.15) 0%, transparent 40%);
+				pointer-events: none; z-index: 0;
+			`;
+			container.appendChild(ambience);
+
+			// Close Button
+			var closeBtn = document.createElement('div');
+			closeBtn.className = 'pyp-modal-close';
+			closeBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 13L13 1M1 1L13 13" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+			container.appendChild(closeBtn);
+
+			// Header
+			var header = document.createElement('div');
+			header.style.cssText = `
+				padding: 40px 40px 20px; z-index: 1; text-align: center;
+				border-bottom: 1px solid rgba(255,255,255,0.05);
+			`;
+			header.innerHTML = `
+				<h1 style="margin: 0; font-family: 'Orbitron', sans-serif; font-size: 42px; background: linear-gradient(135deg, #fff 0%, #38bdf8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 20px rgba(56, 189, 248, 0.5);">GAME GUIDE</h1>
+				<p style="margin: 10px 0 0; font-family: 'Rajdhani', sans-serif; font-size: 18px; color: #94a3b8; letter-spacing: 1px;">MASTER THE BASICS • EARN REWARDS • CONQUER HEDERA</p>
+			`;
+			container.appendChild(header);
+
+			// Scrollable Content
+			var contentScroll = document.createElement('div');
+			contentScroll.className = 'pyp-scroll';
+			contentScroll.style.cssText = `
+				flex: 1; overflow-y: auto; padding: 30px 40px; z-index: 1;
+			`;
+
+			var steps = [
+				{ icon: '🔐', title: 'Create Identity', desc: 'Sign up via email & finalize your profile to generate your unique on-chain ID and EVM address.' },
+				{ icon: '🚀', title: 'Enter World', desc: 'From the main menu, dive into the game. Watch the intro walkthrough and spawn in your first room.' },
+				{ icon: '🪟', title: 'Contextual Window', desc: 'Hover & click the room window to access learning courses. Expand your knowledge base.' },
+				{ icon: '🖼️', title: 'First Quest', desc: 'Click the picture on the left. Find and collect the stick to complete your initiating challenge.' },
+				{ icon: '👛', title: 'Wallet Setup', desc: 'Download HashPack when prompted. Essential for rewards, progression, and real on-chain assets.' },
+				{ icon: '🌱', title: 'Daily Rewards', desc: 'Find the magical plant. Click it daily to harvest rewards and boost your leveling speed.' },
+				{ icon: '📄', title: 'Hedera Archives', desc: 'Inspect the paper on the table. Unlock lore and technical knowledge about the Hedera network.' },
+				{ icon: '🐠', title: 'Oracle Fish', desc: 'Consult the Aquarium AI. Your personal guide for tasks, progress tracking, and wisdom.' },
+			];
+
+			var grid = document.createElement('div');
+			grid.className = 'pyp-card-grid';
+
+			steps.forEach((step, index) => {
+				var card = document.createElement('div');
+				card.className = 'pyp-step-card';
+				card.style.animation = `slideUpFade 0.5s ease backwards ${index * 0.1}s`;
+				card.innerHTML = `
+					<div class="pyp-step-number">${String(index + 1).padStart(2, '0')}</div>
+					<div class="pyp-step-icon">${step.icon}</div>
+					<h3 style="margin: 0 0 8px; font-family: 'Orbitron', sans-serif; color: white; font-size: 18px;">${step.title}</h3>
+					<p style="margin: 0; font-family: 'Rajdhani', sans-serif; color: #94a3b8; font-size: 16px; line-height: 1.4;">${step.desc}</p>
+				`;
+				grid.appendChild(card);
+			});
+
+			contentScroll.appendChild(grid);
+			container.appendChild(contentScroll);
+
+			// Footer
+			var footer = document.createElement('div');
+			footer.style.cssText = `
+				padding: 30px; text-align: center; z-index: 1;
+				border-top: 1px solid rgba(255,255,255,0.05);
+			`;
+			
+			var btn = document.createElement('button');
+			btn.className = 'pyp-play-btn';
+			btn.innerHTML = 'ENTER THE PATH';
+			footer.appendChild(btn);
+			
+			container.appendChild(footer);
+			modal.appendChild(container);
+			document.body.appendChild(modal);
+
+			// Show logic
+			requestAnimationFrame(() => modal.style.opacity = '1');
+
+			var closeAction = function() {
+				modal.style.opacity = '0';
+				container.style.transform = 'scale(0.95)';
+				container.style.opacity = '0';
+				setTimeout(function(){ modal.remove(); }, 500);
+			};
+
+			closeBtn.onclick = closeAction;
+			btn.onclick = closeAction;
+			modal.onclick = function(e) { if (e.target === modal) closeAction(); };
+		})();
 
 		console.log('PYP Overlay and Quest Status initialized');
 	}
